@@ -11,6 +11,7 @@ module VCSRuby
     attr_reader :length
     
     def initialize video
+      @commands = Commands.new
       @video = video
     end
     

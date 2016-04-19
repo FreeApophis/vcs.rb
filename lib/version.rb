@@ -1,27 +1,7 @@
 #
-# Version of Video Contact Sheet Ruby
+# Version of vcs.rb
 #
-module VCSRuby
-  class Version
-    def version
-     
-    end
-    
-    def major
-      0
-    end
-    
-    def minor
-      1
-    end
 
-    def revision
-      1
-    end
-    
-    def appendix
-      'pre'
-    end
-    
-  end
-end
+$vcs_ruby_version = Gem::Version.new('0.1.0')
+$vcs_ruby_name = 'Video Contact Sheet Ruby'
+$vcs_ruby_short = 'vcr.rb'
