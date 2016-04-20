@@ -14,31 +14,28 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 require 'optparse'
 require 'vcs'
 
-#result = RubyProf.profile do
-
-options =
-{
-    :verbose => false,
-}
-
-arguments =
-{
-    "--capturer" => [:ffmpeg, :libav, :mplayer],
-    "--format" => [:png, :jpeg],
-}  
-
-def list_arguments arguments
-   arguments.map{ |argument| argument.to_s }.join(', ')
-end
-
+include VCSRuby
 
 # Load config files
 
-config_file, config = File.expand_path('../config.yml', __FILE__), {}
+config_file, config = File.expand_path('~/.vcs.rb.yml'), {}
 config = YAML.load_file(config_file) if File.exists?(config_file)
 
 # Configuration can Override options
-options = { interval: 300, quiet: true }.merge(config)
+options = { 
+          interval: 300, 
+             quiet: false, 
+           verbose: false, 
+          capturer: :any 
+}.merge(config)
+
+# Command Line Parameter arguments
+
+arguments =
+{
+    "--capturer" => [:ffmpeg, :libav, :mplayer, :any],
+    "--format" => [:png, :jpeg],
+}  
 
 # Command Line Parameters
 optparse = OptionParser.new do|opts| 
@@ -74,10 +71,10 @@ optparse = OptionParser.new do|opts|
   opts.on( '-T [TITLE]', '--title [TITLE]', 'Set ending time. No caps beyond this.') do |title|
     options[:title] = title
   end
-  opts.on( '-f [format]', '--format [FORMAT]', arguments['--format'], 'Formats: ' + list_arguments(arguments["--format"])) do |format|
+  opts.on( '-f [format]', '--format [FORMAT]', arguments['--format'], 'Formats: ' + Tools::list_arguments(arguments["--format"])) do |format|
     options[:format] = :jpg
   end
-  opts.on('-C [CAPTURER]', '--capture [CAPTURER]', arguments['--capturer'], 'Capturer: ' + list_arguments(arguments["--capturer"])) do |capturer|
+  opts.on('-C [CAPTURER]', '--capture [CAPTURER]', arguments['--capturer'], 'Capturer: ' + Tools::list_arguments(arguments["--capturer"])) do |capturer|
     options[:capturer] = capturer
   end
   opts.on( '-T [TITLE]', '--title [TITLE]', 'Set ending time. No caps beyond this.') do |title|
@@ -122,34 +119,19 @@ optparse = OptionParser.new do|opts|
   opts.separator ''
 end
 
-def print_help optparse
-  puts optparse.summarize
-  exit 0
-end
-
-print_help optparse if ARGV.empty?
+Tools::print_help optparse if ARGV.empty?
   
 optparse.parse!
 
-print_help optparse if options[:help] || ARGV.empty?
+Tools::print_help optparse if options[:help] || ARGV.empty?
 
-def contact_sheet_with_options video, options
-  VCSRuby::ContactSheet.new 'video.mkv' do
-    sheet.rows = options[:rows] if options[:rows]
-    sheet.columns = options[:columns] if options[:columns]
-
-    sheet.thumbnail_width = options[:width] if options[:width]
-    sheet.thumbnail_width = options[:width] if options[:width]
-    sheet.thumbnail_height = options[:height] if options[:height]
-  end
-end
+Tools::verbose = options[:verbose]
 
 # Invoke ContactSheet
 
 ARGV.each do |video|
-  sheet = contact_sheet_with_options video, options
+  sheet = Tools::contact_sheet_with_options video, options
   sheet.create
-
 
   puts sheet.thumbnail_width
   puts sheet.thumbnail_height

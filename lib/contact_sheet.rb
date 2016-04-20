@@ -11,11 +11,29 @@ module VCSRuby
     attr_reader :thumbnail_width, :thumbnail_height, :thumbnail_aspect
     
     attr_reader :length
+    attr_reader :capturer
     
     def initialize video
       @commands = Commands.new
+      
       @video = video
       @thumbails = []
+    end
+
+    def capturer= capturer
+      case capturer
+        when :any
+          @capturer = @commands.best_capturer         
+        when :ffmpeg
+          @capturer = @commands.ffmpeg
+        when :libav
+          @capturer = @commands.libav
+        when :mplayer
+          @capturer = @commands.mplayer
+      end
+    end
+
+    def capturer
     end
 
     def create
@@ -25,7 +43,6 @@ module VCSRuby
     end
     
     def output_format
-      :png
     end
     
     def rows=
