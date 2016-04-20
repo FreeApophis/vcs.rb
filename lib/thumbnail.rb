@@ -6,7 +6,8 @@ module VCSRuby
   class Thumbnail
     attr_accessor :width, :height, :aspect
 
-    def initilize
+    def capture
+      raise "NotImplementedException"
     end
   end
 end

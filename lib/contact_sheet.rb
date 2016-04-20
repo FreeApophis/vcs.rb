@@ -3,16 +3,22 @@
 #
 
 require 'thumbnail'
+require 'commands'
 
 module VCSRuby
   class ContactSheet 
     attr_reader :rows, :columns, :interval
+    attr_reader :thumbnail_width, :thumbnail_height, :thumbnail_aspect
     
     attr_reader :length
     
     def initialize video
       @commands = Commands.new
       @video = video
+      @thumbails = []
+    end
+
+    def create
     end
     
     def input_format
@@ -53,7 +59,7 @@ module VCSRuby
     end
     
     def mode
-      [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, random]
+      [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, :random]
     end
     
 private

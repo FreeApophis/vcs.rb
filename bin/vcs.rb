@@ -16,8 +16,6 @@ require 'vcs'
 
 #result = RubyProf.profile do
 
-last_arg = ARGV.last
-
 options =
 {
     :verbose => false,
@@ -26,7 +24,12 @@ options =
 arguments =
 {
     "--capturer" => [:ffmpeg, :libav, :mplayer],
+    "--format" => [:png, :jpeg],
 }  
+
+def list_arguments arguments
+   arguments.map{ |argument| argument.to_s }.join(', ')
+end
 
 
 # Load config files
@@ -71,10 +74,10 @@ optparse = OptionParser.new do|opts|
   opts.on( '-T [TITLE]', '--title [TITLE]', 'Set ending time. No caps beyond this.') do |title|
     options[:title] = title
   end
-  opts.on( '-f [format]', '--format [FORMAT]', 'jpg png ...') do |format|
+  opts.on( '-f [format]', '--format [FORMAT]', arguments['--format'], 'Formats: ' + list_arguments(arguments["--format"])) do |format|
     options[:format] = :jpg
   end
-  opts.on('-C [CAPTURER]', '--capture [CAPTURER]', arguments['--capturer'], 'Capturer: ' + arguments["--capturer"].map{|a| a.to_s}.join(', ')) do |capturer|
+  opts.on('-C [CAPTURER]', '--capture [CAPTURER]', arguments['--capturer'], 'Capturer: ' + list_arguments(arguments["--capturer"])) do |capturer|
     options[:capturer] = capturer
   end
   opts.on( '-T [TITLE]', '--title [TITLE]', 'Set ending time. No caps beyond this.') do |title|
@@ -124,13 +127,32 @@ def print_help optparse
   exit 0
 end
 
-print_help optparse if ARGV.count == 0 
+print_help optparse if ARGV.empty?
   
 optparse.parse!
 
-print_help optparse if options[:help]
+print_help optparse if options[:help] || ARGV.empty?
+
+def contact_sheet_with_options video, options
+  VCSRuby::ContactSheet.new 'video.mkv' do
+    sheet.rows = options[:rows] if options[:rows]
+    sheet.columns = options[:columns] if options[:columns]
+
+    sheet.thumbnail_width = options[:width] if options[:width]
+    sheet.thumbnail_width = options[:width] if options[:width]
+    sheet.thumbnail_height = options[:height] if options[:height]
+  end
+end
 
 # Invoke ContactSheet
-sheet = VcsRuby::ContactSheet.new
-sheet.create
+
+ARGV.each do |video|
+  sheet = contact_sheet_with_options video, options
+  sheet.create
+
+
+  puts sheet.thumbnail_width
+  puts sheet.thumbnail_height
+  puts sheet.thumbnail_aspect
+end
 
