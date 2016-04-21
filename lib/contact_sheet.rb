@@ -2,6 +2,7 @@
 # Contact Sheet Composited from the Thumbnails
 #
 
+require 'tmpdir'
 require 'thumbnail'
 require 'time_index'
 require 'libav'	
@@ -28,6 +29,7 @@ module VCSRuby
       @columns = 4      
       @number_of_caps = 16
       @interval = @length /17
+      @tempdir = Dir.mktmpdir
     end
 
     def initialize_capturers
@@ -91,6 +93,7 @@ private
         thumb.width = thumbnail_width
         thumb.height = thumbnail_height
         thumb.time = (time += @interval)
+        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.png")
 
         @thumbnails << thumb
       end

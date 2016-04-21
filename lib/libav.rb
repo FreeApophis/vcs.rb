@@ -52,11 +52,7 @@ module VCSRuby
       @dar
     end
 
-    def image_path
-      (0...8).map { (97 + rand(26)).chr }.join + '.png'
-    end
-
-    def grab time
+    def grab time, image_path
       @avconv.execute "-ss #{time.total_seconds} -i #{@video} -an -dframes 1 -vframes 1 -vcodec png -f rawvideo #{image_path}"
     end
 
