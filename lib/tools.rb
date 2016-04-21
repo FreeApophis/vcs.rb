@@ -10,10 +10,20 @@ module VCSRuby
 
     def self.verbose= verbose
       @verbose = verbose
+      @quiet = false if @verbose
     end
 
-    def self.verbose
+    def self.verbose?
       @verbose
+    end
+
+    def self.quiet= quiet
+      @quiet = quiet
+      @verbose = false if @quiet
+    end
+
+    def self.quiet?
+      @quiet
     end
 
     def self.list_arguments arguments

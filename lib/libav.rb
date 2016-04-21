@@ -34,7 +34,7 @@ module VCSRuby
 
     def width
       load_probe
-      @height
+      @width
     end
 
     def height

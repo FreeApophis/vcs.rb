@@ -43,7 +43,8 @@ module VCSRuby
     def build
       initialize_thumbnails
       
-      @thumbnails.each do |thumbnail|
+      @thumbnails.each_with_index do |thumbnail, i|
+        puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
         thumbnail.capture
       end
     end

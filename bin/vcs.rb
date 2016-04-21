@@ -89,13 +89,13 @@ optparse = OptionParser.new do|opts|
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
     options[:quiet] = true
   end
+  opts.on("-V", "--verbose", "More verbose Output.") do
+    options[:verbose] = true
+  end
   opts.on( '-v', '--version', 'Version' ) do 
     puts $vcs_ruby_name + ' ' + $vcs_ruby_version.to_s
     exit 0 
   end 
-  opts.on("-V", "--verbose", "Verbose Output") do
-    options[:verbose] = true
-  end
   
   opts.on( '-h', '--help', 'Prints help' ) do 
     options[:help] = true
@@ -126,6 +126,7 @@ optparse.parse!
 Tools::print_help optparse if options[:help] || ARGV.empty?
 
 Tools::verbose = options[:verbose]
+Tools::quiet = options[:quiet]
 
 # Invoke ContactSheet
 
