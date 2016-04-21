@@ -25,7 +25,8 @@ module VCSRuby
       raise "NotImplmentedException"
     end
 
-    def aspect_ratio
+    def grab time
+      raise "NotImplmentedException"
     end
   end
 end

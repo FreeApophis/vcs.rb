@@ -6,14 +6,18 @@ module VCSRuby
   class TimeIndex
     attr_reader :total_seconds
 
-    def initialize time_interval_string = ''
-      @total_seconds = 0.0 
-      @to_parse = time_interval_string.strip
+    def initialize time_index = ''
+      if time_index.instance_of? Float
+        @total_seconds = time_index
+      else
+        @total_seconds = 0.0 
+        @to_parse = time_index.strip
 
-      unless @to_parse.empty?
-        try_parse_ffmpeg_index
-        try_parse_vcs_index
-        try_parse_as_number
+        unless @to_parse.empty?
+          try_parse_ffmpeg_index
+          try_parse_vcs_index
+          try_parse_as_number
+        end
       end
     end
 
@@ -28,7 +32,7 @@ module VCSRuby
 
     def try_parse_vcs_index
       if @to_parse =~ /\d*m|\d*h|\d*s/
-        parts = s.split(/(\d*h)|(\d*m)|(\d*s)/).select{|e| !e.empty?}
+        parts = @to_parse.split(/(\d*h)|(\d*m)|(\d*s)/).select{|e| !e.empty?}
         parts.each do |part|
           add_vcs_part part
         end
@@ -36,8 +40,8 @@ module VCSRuby
     end
 
     def add_vcs_part part
-      @total_seconds += part.to_i * 60 * 60 if part.end_with? 'h'
-      @total_seconds += part.to_i * 60 if part.end_with? 'm'
+      return @total_seconds += part.to_i * 60 * 60 if part.end_with? 'h'
+      return @total_seconds += part.to_i * 60 if part.end_with? 'm'
       @total_seconds += part.to_i
     end
 
@@ -47,7 +51,6 @@ module VCSRuby
         @total_seconds += temp
       end
     end
-
 
     def total_seconds
       @total_seconds
@@ -63,6 +66,30 @@ module VCSRuby
 
     def seconds
       @total_seconds % 60
+    end
+
+    def + operand
+      if operand.instance_of? Fixnum
+        TimeIndex.new @total_seconds + operand
+      else
+        TimeIndex.new @total_seconds + operand.total_seconds
+      end
+    end
+
+    def - operand
+      if operand.instance_of? Fixnum
+        TimeIndex.new @total_seconds - operand
+      else
+        TimeIndex.new @total_seconds - operand.total_seconds
+      end
+    end
+
+    def * operand
+      TimeIndex.new total_seconds * operand
+    end
+
+    def / operand
+      TimeIndex.new @total_seconds / operand
     end
 
     def to_s

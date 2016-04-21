@@ -1,4 +1,4 @@
-#
+
 # Contact Sheet Composited from the Thumbnails
 #
 
@@ -11,11 +11,11 @@ require 'ffmpeg'
 module VCSRuby
   class ContactSheet 
     attr_accessor :capturer
-
     attr_reader :rows, :columns, :interval
     attr_reader :thumbnail_width, :thumbnail_height, :thumbnail_aspect
     
     attr_reader :length
+    attr_accessor :to, :from
     
     def initialize video
       @video = video
@@ -27,6 +27,7 @@ module VCSRuby
       @rows = 4
       @columns = 4      
       @number_of_caps = 16
+      @interval = @length /17
     end
 
     def initialize_capturers
@@ -36,11 +37,12 @@ module VCSRuby
       capturers << FFmpeg.new(@video)
 
       @capturers = capturers.select{ |c| c.available? }
-      puts "Available Capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}"
+      puts "Available capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}"
     end
 
     def build
       initialize_thumbnails
+      
       @thumbnails.each do |thumbnail|
         thumbnail.capture
       end
@@ -62,16 +64,10 @@ module VCSRuby
         @rows = rows
         @columns = columns
         @number_of_caps = rows * columns
-        @interval = 4.0
+        @interval = @length / @number_of_caps + 1
       end
     end
     
-    def from=
-    end
-    
-    def to=
-    end
-       
     def thumbnail_width= width
     end
 
@@ -87,8 +83,15 @@ module VCSRuby
     
 private
     def initialize_thumbnails
+      time = TimeIndex.new 0.0
       (1..@number_of_caps).each do |i|
-        @thumbnails << Thumbnail.new
+        thumb = Thumbnail.new @capturers.first, @video
+
+        thumb.width = thumbnail_width
+        thumb.height = thumbnail_height
+        thumb.time = (time += @interval)
+
+        @thumbnails << thumb
       end
     end
 
@@ -98,9 +101,16 @@ private
     end
 
     def detect_length
-      @capturers.each do |cap|
-        return cap.length
-      end
+      @length = @capturers.first.length
+
+      @from = TimeIndex.new 0.0
+      @to = @length
+    end
+
+    def detect_dimensions
+      @thumbnail_width = @capturers.first.width
+      @thumbnail_height = @capturers.first.height
+#      @thumbnail_aspect = @capturers.first.aspect
     end
   end
 end
