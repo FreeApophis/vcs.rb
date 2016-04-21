@@ -26,13 +26,16 @@ module VCSRuby
     end
 
     def self.contact_sheet_with_options video, options
-      VCSRuby::ContactSheet.new 'video.mkv' do |sheet|
-        sheet.rows = options[:rows] if options[:rows]
-        sheet.columns = options[:columns] if options[:columns]
+      sheet = VCSRuby::ContactSheet.new video
+      sheet.capturer = options[:capturer]
 
-        sheet.thumbnail_width = options[:width] if options[:width]
-        sheet.thumbnail_height = options[:height] if options[:height]
-      end
+      sheet.rows = options[:rows] if options[:rows]
+      sheet.columns = options[:columns] if options[:columns]
+
+      sheet.thumbnail_width = options[:width] if options[:width]
+      sheet.thumbnail_height = options[:height] if options[:height]
+
+      sheet
     end
   end
 end

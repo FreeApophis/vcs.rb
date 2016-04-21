@@ -131,7 +131,8 @@ Tools::verbose = options[:verbose]
 
 ARGV.each do |video|
   sheet = Tools::contact_sheet_with_options video, options
-  sheet.create
+  sheet.frames(4,nil,78,nil)
+  sheet.build
 
   puts sheet.thumbnail_width
   puts sheet.thumbnail_height

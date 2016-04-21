@@ -3,61 +3,67 @@
 #
 
 require 'thumbnail'
-require 'commands'
+require 'time_index'
+require 'libav'	
+require 'mplayer'
+require 'ffmpeg'	
 
 module VCSRuby
   class ContactSheet 
+    attr_accessor :capturer
+
     attr_reader :rows, :columns, :interval
     attr_reader :thumbnail_width, :thumbnail_height, :thumbnail_aspect
     
     attr_reader :length
-    attr_reader :capturer
     
     def initialize video
-      @commands = Commands.new
-      
       @video = video
-      @thumbails = []
+      initialize_capturers
+      detect_video_properties
+      
+      @thumbnails = []
+
+      @rows = 4
+      @columns = 4      
+      @number_of_caps = 16
     end
 
-    def capturer= capturer
-      case capturer
-        when :any
-          @capturer = @commands.best_capturer         
-        when :ffmpeg
-          @capturer = @commands.ffmpeg
-        when :libav
-          @capturer = @commands.libav
-        when :mplayer
-          @capturer = @commands.mplayer
+    def initialize_capturers
+      capturers = []
+      capturers << LibAV.new(@video)
+      capturers << MPlayer.new(@video)
+      capturers << FFmpeg.new(@video)
+
+      @capturers = capturers.select{ |c| c.available? }
+      puts "Available Capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}"
+    end
+
+    def build
+      initialize_thumbnails
+      @thumbnails.each do |thumbnail|
+        thumbnail.capture
       end
     end
 
-    def capturer
-    end
 
-    def create
-    end
-    
     def input_format
     end
     
     def output_format
     end
     
-    def rows=
-    end
-    
-    def columns= columns
-      @columns = columns
-    end
-    
-    def number_of_caps= caps
-      @number_of_caps = caps
-      @columns = caps / @rows
-    end
-    
-    def interval=
+    # Use this method to initialize the number of frames
+    # The Method allows exactly two parameters of the four
+    # All others must be nil and will be calculated
+    def frames(rows, columns, numcaps, interval)
+      raise "ONLY 2 PARAMETERS ALLOWED" unless local_variables.map{ |v| eval(v.to_s) ? 1 : 0 }.reduce(0, &:+) == 2
+      if (rows && columns)
+        @rows = rows
+        @columns = columns
+        @number_of_caps = rows * columns
+        @interval = 4.0
+      end
     end
     
     def from=
@@ -66,13 +72,13 @@ module VCSRuby
     def to=
     end
        
-    def thumbnail_width
+    def thumbnail_width= width
     end
 
-    def thumbnail_height
+    def thumbnail_height= height
     end
     
-    def thumbnail_aspect
+    def thumbnail_aspect= aspect
     end
     
     def mode
@@ -80,13 +86,21 @@ module VCSRuby
     end
     
 private
-    def  calculate_number_of_caps
-      @number_of_caps = @rows * @columns
-    end
-    
-    def  calculate_interval
-
+    def initialize_thumbnails
+      (1..@number_of_caps).each do |i|
+        @thumbnails << Thumbnail.new
+      end
     end
 
+    def detect_video_properties
+      detect_length
+      detect_dimensions
+    end
+
+    def detect_length
+      @capturers.each do |cap|
+        return cap.length
+      end
+    end
   end
 end
