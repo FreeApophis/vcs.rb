@@ -49,6 +49,23 @@ module VCSRuby
         puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
         thumbnail.capture
       end
+
+      font_path = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
+
+      MiniMagick::Tool::Convert.new do |convert|
+        convert.stack do |ul|
+          ul.size('1000x40')
+          ul << 'xc:White'
+          ul.font(font_path )
+          ul.pointsize(33)
+          ul.background('White')
+          ul.fill('Black')
+          ul.gravity('Center')
+          ul.annotate(0, 'This is a Title!!!')
+        end
+        convert.flatten
+        convert << 'example.png'
+      end
     end
 
 
