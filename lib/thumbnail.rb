@@ -18,6 +18,7 @@ module VCSRuby
 
     def capture 
       @capper.grab @time, @image_path
+
       image = MiniMagick::Image.open @image_path
       image.resize "#{width}x#{height}!"
       image.write @image_path

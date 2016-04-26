@@ -3,6 +3,7 @@
 #
 
 require 'tmpdir'
+require 'font'
 require 'thumbnail'
 require 'time_index'
 require 'libav'	
@@ -30,7 +31,7 @@ module VCSRuby
       @number_of_caps = 16
       @interval = @length /17
       @tempdir = Dir.mktmpdir
-      @font_path = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
+      @standard_font = Font.new 'DejaVuSans'
     end
 
     def initialize_capturers
@@ -57,7 +58,7 @@ module VCSRuby
         @thumbnails.each do |thumbnail|
           montage << thumbnail.image_path
         end
-        montage.geometry '+0+0'             # Zwischenraum
+        montage.geometry "+#{0}+#{0}"             # Zwischenraum
         montage.tile "#{@columns}x#{@rows}" # 
         montage << File::join(@tempdir, "montage.png")
       end
@@ -73,7 +74,7 @@ module VCSRuby
         convert.stack do |ul|
           ul.size '1000x40'
           ul << 'xc:White'
-          ul.font @font_path
+          ul.font @standard_font.full_path
           ul.pointsize 33
           ul.background 'White'
           ul.fill 'Black'
@@ -89,21 +90,21 @@ module VCSRuby
           a.size '771x1'
           a.xc '#afcd7a'
           a.size.+
-          a.font @font_path
+          a.font @standard_font.full_path
           a.pointsize 14
           a.background '#afcd7a'
           a.fill 'Black'
           a.stack do |b|
             b.gravity 'West'
             b.stack do |c|
-              c << 'label:Filename'
-              c.font @font_path
-              c << 'label:2d.mp4'
+              c.label 'Filename: '
+              c.font @standard_font.full_path
+              c.label @video
               c.append.+
             end
-            b.font @font_path
-            b << 'label:File size:85.97MiB'
-            b << 'label:Length: 23:30'
+            b.font @standard_font.full_path
+            b.label 'File size: 85.97MiB'
+            b.label "Length: #{@length}"
             b.append
             b.crop '789x51+0+0'
           end
@@ -124,7 +125,7 @@ module VCSRuby
           a.size '789x28'
           a.gravity 'Center'
           a.xc 'SlateGray'
-          a.font @font_path
+          a.font @standard_font.full_path
           a.pointsize 10
           a.fill 'Black'
           a.annotate(0, 'Preview created by vcs.rb')

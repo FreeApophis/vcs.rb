@@ -53,7 +53,7 @@ module VCSRuby
     end
 
     def grab time, image_path
-      @avconv.execute "-ss #{time.total_seconds} -i #{@video} -an -dframes 1 -vframes 1 -vcodec png -f rawvideo #{image_path}"
+      @avconv.execute "-y -ss #{time.total_seconds} -i '#{@video}' -an -dframes 1 -vframes 1 -vcodec png -f rawvideo '#{image_path}'"
     end
 
     def to_s
@@ -64,8 +64,7 @@ private
     def load_probe
       return if @cache
 
-      @cache = @avprobe.execute("#{@video}", "2>&1")
-
+      @cache = @avprobe.execute("'#{@video}'", "2>&1")
       parse_dimensions
     end
 
@@ -73,11 +72,15 @@ private
       video_stream = split_stream_line(video_streams(@cache).first)
 
       dimensions = /(\d*)x(\d*) \[PAR (\d*:\d*) DAR (\d*:\d*)\]/.match(video_stream[DIMENSION])
-
+      if dimensions
+        @par = dimensions[3]
+        @dar = dimensions[4]
+      else
+        dimensions = /(\d*)x(\d*)/.match(video_stream[DIMENSION])
+   
+      end
       @width = dimensions[1]
       @height = dimensions[2]
-      @par = dimensions[3]
-      @dar = dimensions[4]
     end
 
     def video_streams probe
@@ -93,7 +96,6 @@ private
       stream = parts.shift
       result = stream.split(':')
       result += parts
-
       return result.map(&:strip)
     end
   end
