@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.license       = 'GPL3'
   
   s.required_ruby_version = '>= 1.8.6'
-  s.add_runtime_dependency 'minimagick',
-  s.requirements << 'libmagick'
-  s.requirements << 'ffmpeg, libav or mplayer'
+  s.add_dependency 'minimagick'
+  s.requirements << 'libav or ffmpeg or mplayer'
 end

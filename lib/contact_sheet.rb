@@ -2,6 +2,7 @@
 # Contact Sheet Composited from the Thumbnails
 #
 
+require 'fileutils'
 require 'tmpdir'
 require 'yaml'
 
@@ -16,6 +17,7 @@ module VCSRuby
       @configuration = Configuration.new
 
       initialize_capturers video
+      puts "Processing #{File.basename(video)}..." unless Tools.quiet?
       detect_video_properties
       
       @thumbnails = []
@@ -27,12 +29,19 @@ module VCSRuby
       initialize_thumbnails
       capture_thumbnails
       
+      puts "Composing standard contact sheet..." unless Tools.quiet?
       s = splice_montage(montage_thumbs)
 
       image = MiniMagick::Image.open(s)
 
       create_title image if @title
+
+      puts "Adding header and footer..." unless Tools.quiet?
       compose_cs image
+      puts "Done. Output wrote to 2d.mp4.png" unless Tools.quiet?
+      #FileUtils.mv()
+      puts "Cleaning up..." unless Tools.quiet?
+      #FileUtils.rm()
     end
 
     attr_writer :rows
@@ -92,6 +101,8 @@ private
     end
 
     def capture_thumbnails
+      puts "Capturing in range [TODO]. Total length: #{@length}" unless Tools.quiet?
+
       @thumbnails.each_with_index do |thumbnail, i|
         puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
         thumbnail.capture
