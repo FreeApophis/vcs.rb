@@ -37,10 +37,11 @@ module VCSRuby
 
     def self.contact_sheet_with_options video, options
       sheet = VCSRuby::ContactSheet.new video
-      sheet.capturer = options[:capturer]
+      sheet.capturer = options[:capturer] if options[:capturer]
 
-      sheet.rows = options[:rows] if options[:rows]
-      sheet.columns = options[:columns] if options[:columns]
+      sheet.rows = options[:rows].to_i if options[:rows]
+      sheet.columns = options[:columns].to_i if options[:columns]
+      sheet.number_of_caps = options[:numcaps].to_i if options[:numcaps]
 
       sheet.thumbnail_width = options[:width] if options[:width]
       sheet.thumbnail_height = options[:height] if options[:height]

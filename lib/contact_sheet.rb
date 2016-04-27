@@ -3,122 +3,98 @@
 #
 
 require 'tmpdir'
-require 'font'
-require 'tools'
-require 'thumbnail'
-require 'time_index'
-require 'libav'	
-require 'mplayer'
-require 'ffmpeg'	
+require 'yaml'
+
+require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :capturer
-    attr_reader :rows, :columns, :interval
-    attr_reader :thumbnail_width, :thumbnail_height, :thumbnail_aspect
-    
+    attr_accessor :thumbnail_width, :thumbnail_height, :capturer
     attr_reader :length
-    attr_accessor :to, :from
-    
+      
     def initialize video
-      @video = video
-      initialize_capturers
+      @configuration = Configuration.new
+
+      initialize_capturers video
       detect_video_properties
       
       @thumbnails = []
 
-      @rows = 4
-      @columns = 4
-      @number_of_caps = 16
-      @interval = @length /17
       @tempdir = Dir.mktmpdir
-      @standard_font = Font.new 'DejaVuSans'
-    end
-
-    def selected_capturer
-      @capturers.first
-    end
-
-    def initialize_capturers
-      capturers = []
-      capturers << LibAV.new(@video)
-      capturers << MPlayer.new(@video)
-      capturers << FFmpeg.new(@video)
-
-      @capturers = capturers.select{ |c| c.available? }
-      puts "Available capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}"
     end
 
     def build
       initialize_thumbnails
+      capture_thumbnails
       
+      m = montage_thumbs
+      image = MiniMagick::Image.open(m)
+
+      create_title montage if @title
+      compose_cs image
+    end
+
+    attr_writer :rows
+    def rows
+      @rows || @configuration.rows || raise("ROW")
+    end
+
+    attr_writer :columns
+    def columns
+      @rows || @configuration.columns || raise("COLUMNS")
+    end
+
+    attr_writer :number_of_caps
+    def number_of_caps
+      @number_of_caps || raise("CAPS")
+    end
+
+    attr_writer :interval
+    def interval
+      @length / number_of_caps
+    end
+
+private
+    def selected_capturer
+      if @capturer == nil || @capturer == :any
+        return @capturers.first
+      else
+        return @capturers.select{ |c| c.name == @capturer }
+      end
+      raise "Selected Capturer (#{@capturer}) not available"
+    end
+
+    def initialize_capturers video
+      capturers = []
+      capturers << LibAV.new(video)
+      capturers << MPlayer.new(video)
+      capturers << FFmpeg.new(video)
+
+      @video = video
+      @capturers = capturers.select{ |c| c.available? }
+
+      puts "Available capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}" if Tools.verbose?
+    end
+
+    def initialize_thumbnails
+      time = TimeIndex.new 0.0
+      (1..number_of_caps).each do |i|
+        thumb = Thumbnail.new selected_capturer, @video, @configuration
+
+        thumb.width = thumbnail_width
+        thumb.height = thumbnail_height
+        thumb.time = (time += interval)
+        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.png")
+
+        @thumbnails << thumb
+      end
+    end
+
+    def capture_thumbnails
       @thumbnails.each_with_index do |thumbnail, i|
         puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
         thumbnail.capture
         thumbnail.apply_filters
-      end
-
-      m = montage_thumbs
-
-      
-      MiniMagick::Tool::Convert.new do |convert|
-        convert << File::join(@tempdir, "montage.png")
-        convert.background 'Transparent'
-        convert.splice '5x10'      
-        convert << File::join(@tempdir, "spliced.png")
-      end    
-
-      create_title if @title
-
-      image = MiniMagick::Image.open(m)
-      compose_cs image
-    end
-
-
-    def input_format
-    end
-    
-    def output_format
-    end
-    
-    # Use this method to initialize the number of frames
-    # The Method allows exactly two parameters of the four
-    # All others must be nil and will be calculated
-    def frames(rows, columns, numcaps, interval)
-      raise "ONLY 2 PARAMETERS ALLOWED" unless local_variables.map{ |v| eval(v.to_s) ? 1 : 0 }.reduce(0, &:+) == 2
-      if (rows && columns)
-        @rows = rows
-        @columns = columns
-        @number_of_caps = rows * columns
-        @interval = @length / @number_of_caps + 1
-      end
-    end
-    
-    def thumbnail_width= width
-    end
-
-    def thumbnail_height= height
-    end
-    
-    def thumbnail_aspect= aspect
-    end
-    
-    def mode
-      [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, :random]
-    end
-    
-private
-    def initialize_thumbnails
-      time = TimeIndex.new 0.0
-      (1..@number_of_caps).each do |i|
-        thumb = Thumbnail.new selected_capturer, @video
-
-        thumb.width = thumbnail_width
-        thumb.height = thumbnail_height
-        thumb.time = (time += @interval)
-        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.png")
-
-        @thumbnails << thumb
       end
     end
 
@@ -142,29 +118,40 @@ private
     def montage_thumbs
       file_path = File::join(@tempdir, 'montage.png')
       MiniMagick::Tool::Montage.new do |montage|
-        montage.background 'Transparent'
+        montage.background @configuration.contact_background
         @thumbnails.each do |thumbnail|
           montage << thumbnail.image_path
         end
-        montage.geometry "+#{0}+#{0}"             # Zwischenraum
+        montage.geometry "+#{2}+#{2}"             # Zwischenraum
         montage.tile "#{@columns}x#{@rows}" # 
         montage << file_path
       end
       return file_path
     end
 
-    def create_title
+    def splice_montage montage
+      file_path = File::join(@tempdir, 'spliced.png')
+      MiniMagick::Tool::Convert.new do |convert|
+        convert << File::join(@tempdir, montage.path)
+        convert.background 'Transparent'
+        convert.splice '5x10'      
+        convert << file_path
+      end    
+      file_path
+     end
+
+    def create_title montage, title
       file_path = File::join(@tempdir, 'title.png')
       MiniMagick::Tool::Convert.new do |convert|
         convert.stack do |ul|
-          ul.size '1000x40'
+          ul.size "#{montage.width}x#{@title_font.line_height}"
           ul << 'xc:White'
-          ul.font @standard_font.full_path
-          ul.pointsize 33
-          ul.background 'White'
-          ul.fill 'Black'
+          ul.font @configuration.title_font.path
+          ul.pointsize @configuration.title_font.size
+          ul.background @configuration.title_background
+          ul.fill @configuration.title_color
           ul.gravity 'Center'
-          ul.annotate(0, 'This is a Title!!!')
+          ul.annotate(0, title)
         end
         convert.flatten
       end
@@ -172,38 +159,39 @@ private
     end
 
     def compose_cs montage
+      file_path = File::join(@tempdir, "final.png")
       MiniMagick::Tool::Convert.new do |convert|
         convert.stack do |a|
           a.size "#{montage.width - 18}x1"
-          a.xc '#afcd7a'
+          a.xc @configuration.header_background
           a.size.+
-          a.font @standard_font.full_path
-          a.pointsize 14
-          a.background '#afcd7a'
+          a.font @configuration.header_font.path
+          a.pointsize @configuration.header_font.size
+          a.background @configuration.header_background
           a.fill 'Black'
           a.stack do |b|
             b.gravity 'West'
             b.stack do |c|
               c.label 'Filename: '
-              c.font @standard_font.full_path
+              c.font  @configuration.header_font.path
               c.label File.basename(@video)
               c.append.+
             end
-            b.font @standard_font.full_path
+            b.font @configuration.header_font.path
             b.label "File size: #{Tools.to_human_size(File.size(@video))}"
             b.label "Length: #{@length}"
             b.append
-            b.crop "#{montage.width}x51+2+2"
+            b.crop "#{montage.width}x51+0+0"
           end
           a.append
           a.stack do |b|
             b.size "#{montage.width}x51"
             b.gravity 'East'
-            b.fill 'Black'
+            b.fill @configuration.header_color
             b.annotate '+0-1'
             b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{selected_capturer.fps}"
           end
-          a.bordercolor '#afcd7a'
+          a.bordercolor @configuration.header_background
           a.border 9
         end
         convert << montage.path
@@ -211,15 +199,16 @@ private
         convert.stack do |a|
           a.size "#{montage.width}x28"
           a.gravity 'Center'
-          a.xc 'SlateGray'
-          a.font @standard_font.full_path
-          a.pointsize 10
-          a.fill 'Black'
+          a.xc @configuration.signature_background
+          a.font @configuration.signature_font.path
+          a.pointsize @configuration.signature_font.size
+          a.fill @configuration.signature_color
           a.annotate(0, 'Preview created by vcs.rb')
         end
         convert.append
-        convert << File::join(@tempdir, "final.png")
+        convert << file_path
       end
+      file_path
     end
   end
 end

@@ -12,6 +12,10 @@ module VCSRuby
       @command = Command.new :ffmpeg, 'ffmpeg'
     end
 
+    def name
+      :ffmpeg
+    end
+
     def length
       info = @command.execute("-i #{@video} -dframes 0 -vframes 0 /dev/null", "2>&1")
       match = /Duration: ([\d|:|.]*)/.match(info)

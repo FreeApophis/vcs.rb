@@ -7,15 +7,15 @@ require 'mini_magick'
 module VCSRuby
   class Thumbnail
     attr_accessor :width, :height, :aspect
-    attr_accessor :time
     attr_accessor :image_path
+    attr_accessor :time
 
-    def initialize capper, video
+    def initialize capper, video, configuration
       @capper = capper
       @video = video
-      @blank_threshold = 0.10
+      @configuration = configuration
+
       @filters = [method(:resize_filter), method(:timestamp_filter)]
-      @timestamp_font = Font.new 'DejaVuSans'
     end
 
     def capture 
@@ -26,7 +26,7 @@ module VCSRuby
       image = MiniMagick::Image.open @image_path
       image.colorspace 'Gray'
       mean = image['%[fx:image.mean]'].to_f
-      return mean < @blank_threshold
+      return mean < @configuration.blank_threshold
     end
 
     def apply_filters
@@ -48,14 +48,14 @@ private
 
     def timestamp_filter convert
       convert.stack do |box|
-        box.box '#000000aa'
-        box.fill 'White'
+        box.box @configuration.timestamp_background
+        box.fill  @configuration.timestamp_color
         box.stroke 'None'
-        box.pointsize 10
+        box.pointsize @configuration.timestamp_font.size
         box.gravity 'SouthEast'
-        box.font @timestamp_font.full_path
+        box.font @configuration.timestamp_font.path
         box.strokewidth 3
-        box.annotate('+5+5', @time.to_s)
+        box.annotate('+5+5', @time.to_timestamp)
       end
       convert.flatten
       convert.gravity 'None'

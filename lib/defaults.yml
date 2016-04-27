@@ -1,0 +1,28 @@
+main:
+  rows: 4
+  columns: 4
+style:
+  header:
+    font: DejaVu-Sans-Book
+    size: 14
+    color: Black
+    background: "#afcd7a"
+  title:
+    font: DejaVu-Sans-Book
+    size: 33
+    color: Black
+    background: White
+  contact:
+    background: White
+  timestamp:
+    font: DejaVu-Sans-Book
+    size: 14
+    color: White
+    background: "#000000aa"
+  signature:
+    font: DejaVu-Sans-Book
+    size: 10
+    color: Black
+    background: SlateGray
+lowlevel:
+  blank_threshold: 0.10

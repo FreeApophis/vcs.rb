@@ -1,5 +1,5 @@
 #
-# Dependencies
+# Command
 #
 
 module VCSRuby

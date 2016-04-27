@@ -2,11 +2,14 @@
 # Capturer Baseclass
 #
 
-
 module VCSRuby
   class Capturer
     def available?
       false
+    end
+
+    def name
+      raise "NotImplmentedException"
     end
 
     def load_video

@@ -13,6 +13,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 
 require 'optparse'
 require 'vcs'
+require 'yaml'
 
 include VCSRuby
 
@@ -33,8 +34,9 @@ options = {
 
 arguments =
 {
-    "--capturer" => [:ffmpeg, :libav, :mplayer, :any],
-    "--format" => [:png, :jpeg],
+    '--capturer' => [:ffmpeg, :libav, :mplayer, :any],
+    '--format' => [:png, :jpeg],
+    '--funky' =>  [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, :random]
 }  
 
 # Command Line Parameters
@@ -132,11 +134,9 @@ Tools::quiet = options[:quiet]
 
 ARGV.each do |video|
   sheet = Tools::contact_sheet_with_options video, options
-  sheet.frames(4,nil,78,nil)
   sheet.build
 
   puts sheet.thumbnail_width
   puts sheet.thumbnail_height
-  puts sheet.thumbnail_aspect
 end
 

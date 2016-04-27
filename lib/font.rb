@@ -6,20 +6,22 @@ require 'mini_magick'
 
 module VCSRuby
   class Font
-    attr_reader :name
+    attr_reader :name, :path, :size
 
-    def initialize name
+    def initialize name, size
       @name = name
+      @path = find_path
+      @size = size
     end
 
-    def full_path
+    def find_path
       '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
     end
 
-    def line_height pointsize
+    def line_height
       MiniMagick::Tool::Convert.new do |convert|
-        convert.font full_path
-        convert.pointsize pointsize
+        convert.font path
+        convert.pointsize size
         convert << 'label:F'
         convert.format '%h'
         convert << 'info:'

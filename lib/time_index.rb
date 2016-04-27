@@ -95,5 +95,13 @@ module VCSRuby
     def to_s
       "#{hours}h#{"%02d" % minutes}m#{"%02d" % seconds}s"
     end
+
+    def to_timestamp
+      if hours == 0
+        "#{"%02d" % minutes}:#{"%02d" % seconds}"
+      else
+        "#{hours}:#{"%02d" % minutes}:#{"%02d" % seconds}"
+      end
+    end
   end
 end

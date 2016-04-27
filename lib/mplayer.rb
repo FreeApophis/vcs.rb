@@ -11,5 +11,9 @@ module VCSRuby
       @video = video
       @command = Command.new :mplayer, 'mplayer'
     end
+
+    def name
+      :mplayer
+    end
   end
 end

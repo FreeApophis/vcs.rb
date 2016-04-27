@@ -16,6 +16,10 @@ module VCSRuby
       detect_version
     end
 
+    def name
+      :libav
+    end
+
     def available?
       @avconv.available && @avprobe.available
     end
@@ -80,7 +84,7 @@ private
       return if @cache
 
       @cache = @avprobe.execute("'#{@video}'", "2>&1")
-puts @cache
+      puts @cache if Tools.verbose?
       parse_dimensions
     end
 
