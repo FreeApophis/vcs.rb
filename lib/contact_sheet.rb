@@ -1,4 +1,4 @@
-
+#
 # Contact Sheet Composited from the Thumbnails
 #
 
@@ -58,17 +58,9 @@ module VCSRuby
         thumbnail.apply_filters
       end
 
+      m = montage_thumbs
 
-      MiniMagick::Tool::Montage.new do |montage|
-        montage.background 'Transparent'
-        @thumbnails.each do |thumbnail|
-          montage << thumbnail.image_path
-        end
-        montage.geometry "+#{0}+#{0}"             # Zwischenraum
-        montage.tile "#{@columns}x#{@rows}" # 
-        montage << File::join(@tempdir, "montage.png")
-      end
-
+      
       MiniMagick::Tool::Convert.new do |convert|
         convert << File::join(@tempdir, "montage.png")
         convert.background 'Transparent'
@@ -76,70 +68,10 @@ module VCSRuby
         convert << File::join(@tempdir, "spliced.png")
       end    
 
-      MiniMagick::Tool::Convert.new do |convert|
-        convert.stack do |ul|
-          ul.size '1000x40'
-          ul << 'xc:White'
-          ul.font @standard_font.full_path
-          ul.pointsize 33
-          ul.background 'White'
-          ul.fill 'Black'
-          ul.gravity 'Center'
-          ul.annotate(0, 'This is a Title!!!')
-        end
-        convert.flatten
-        convert << File::join(@tempdir, "title.png")
-      end
+      create_title if @title
 
-      MiniMagick::Tool::Convert.new do |convert|
-        convert.stack do |a|
-          a.size '771x1'
-          a.xc '#afcd7a'
-          a.size.+
-          a.font @standard_font.full_path
-          a.pointsize 14
-          a.background '#afcd7a'
-          a.fill 'Black'
-          a.stack do |b|
-            b.gravity 'West'
-            b.stack do |c|
-              c.label 'Filename: '
-              c.font @standard_font.full_path
-              c.label @video
-              c.append.+
-            end
-            b.font @standard_font.full_path
-            b.label "File size: #{Tools.to_human_size(File.size(@video))}"
-            b.label "Length: #{@length}"
-            b.append
-            b.crop '789x51+0+0'
-          end
-          a.append
-          a.stack do |b|
-            b.size '789x51'
-            b.gravity 'East'
-            b.fill 'Black'
-            b.annotate '+0-1'
-            b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{selected_capturer.fps}"
-          end
-          a.bordercolor '#afcd7a'
-          a.border 9
-        end
-        convert << File::join(@tempdir, "montage.png")
-        convert.append
-        convert.stack do |a|
-          a.size '789x28'
-          a.gravity 'Center'
-          a.xc 'SlateGray'
-          a.font @standard_font.full_path
-          a.pointsize 10
-          a.fill 'Black'
-          a.annotate(0, 'Preview created by vcs.rb')
-        end
-        convert.append
-        convert << File::join(@tempdir, "final.png")
-      end
-
+      image = MiniMagick::Image.open(m)
+      compose_cs image
     end
 
 
@@ -205,6 +137,89 @@ private
     def detect_dimensions
       @thumbnail_width = selected_capturer.width
       @thumbnail_height = selected_capturer.height
+    end
+
+    def montage_thumbs
+      file_path = File::join(@tempdir, 'montage.png')
+      MiniMagick::Tool::Montage.new do |montage|
+        montage.background 'Transparent'
+        @thumbnails.each do |thumbnail|
+          montage << thumbnail.image_path
+        end
+        montage.geometry "+#{0}+#{0}"             # Zwischenraum
+        montage.tile "#{@columns}x#{@rows}" # 
+        montage << file_path
+      end
+      return file_path
+    end
+
+    def create_title
+      file_path = File::join(@tempdir, 'title.png')
+      MiniMagick::Tool::Convert.new do |convert|
+        convert.stack do |ul|
+          ul.size '1000x40'
+          ul << 'xc:White'
+          ul.font @standard_font.full_path
+          ul.pointsize 33
+          ul.background 'White'
+          ul.fill 'Black'
+          ul.gravity 'Center'
+          ul.annotate(0, 'This is a Title!!!')
+        end
+        convert.flatten
+      end
+      return file_path
+    end
+
+    def compose_cs montage
+      MiniMagick::Tool::Convert.new do |convert|
+        convert.stack do |a|
+          a.size "#{montage.width - 18}x1"
+          a.xc '#afcd7a'
+          a.size.+
+          a.font @standard_font.full_path
+          a.pointsize 14
+          a.background '#afcd7a'
+          a.fill 'Black'
+          a.stack do |b|
+            b.gravity 'West'
+            b.stack do |c|
+              c.label 'Filename: '
+              c.font @standard_font.full_path
+              c.label File.basename(@video)
+              c.append.+
+            end
+            b.font @standard_font.full_path
+            b.label "File size: #{Tools.to_human_size(File.size(@video))}"
+            b.label "Length: #{@length}"
+            b.append
+            b.crop "#{montage.width}x51+2+2"
+          end
+          a.append
+          a.stack do |b|
+            b.size "#{montage.width}x51"
+            b.gravity 'East'
+            b.fill 'Black'
+            b.annotate '+0-1'
+            b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{selected_capturer.fps}"
+          end
+          a.bordercolor '#afcd7a'
+          a.border 9
+        end
+        convert << montage.path
+        convert.append
+        convert.stack do |a|
+          a.size "#{montage.width}x28"
+          a.gravity 'Center'
+          a.xc 'SlateGray'
+          a.font @standard_font.full_path
+          a.pointsize 10
+          a.fill 'Black'
+          a.annotate(0, 'Preview created by vcs.rb')
+        end
+        convert.append
+        convert << File::join(@tempdir, "final.png")
+      end
     end
   end
 end
