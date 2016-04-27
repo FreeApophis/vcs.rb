@@ -4,6 +4,7 @@
 
 require 'tmpdir'
 require 'font'
+require 'tools'
 require 'thumbnail'
 require 'time_index'
 require 'libav'	
@@ -34,6 +35,10 @@ module VCSRuby
       @standard_font = Font.new 'DejaVuSans'
     end
 
+    def selected_capturer
+      @capturers.first
+    end
+
     def initialize_capturers
       capturers = []
       capturers << LibAV.new(@video)
@@ -50,6 +55,7 @@ module VCSRuby
       @thumbnails.each_with_index do |thumbnail, i|
         puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
         thumbnail.capture
+        thumbnail.apply_filters
       end
 
 
@@ -103,7 +109,7 @@ module VCSRuby
               c.append.+
             end
             b.font @standard_font.full_path
-            b.label 'File size: 85.97MiB'
+            b.label "File size: #{Tools.to_human_size(File.size(@video))}"
             b.label "Length: #{@length}"
             b.append
             b.crop '789x51+0+0'
@@ -114,7 +120,7 @@ module VCSRuby
             b.gravity 'East'
             b.fill 'Black'
             b.annotate '+0-1'
-            b << "Dimensions: 384x288\nFormat: MPEG-4 AVC (h.264) / MPEG-4 AAC\nFPS: 25.00"
+            b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{selected_capturer.fps}"
           end
           a.bordercolor '#afcd7a'
           a.border 9
@@ -173,7 +179,7 @@ private
     def initialize_thumbnails
       time = TimeIndex.new 0.0
       (1..@number_of_caps).each do |i|
-        thumb = Thumbnail.new @capturers.first, @video
+        thumb = Thumbnail.new selected_capturer, @video
 
         thumb.width = thumbnail_width
         thumb.height = thumbnail_height
@@ -190,16 +196,15 @@ private
     end
 
     def detect_length
-      @length = @capturers.first.length
+      @length = selected_capturer.length
 
       @from = TimeIndex.new 0.0
       @to = @length
     end
 
     def detect_dimensions
-      @thumbnail_width = @capturers.first.width
-      @thumbnail_height = @capturers.first.height
-#      @thumbnail_aspect = @capturers.first.aspect
+      @thumbnail_width = selected_capturer.width
+      @thumbnail_height = selected_capturer.height
     end
   end
 end
