@@ -8,7 +8,11 @@ require 'time_index'
 
 module VCSRuby
   class LibAV < Capturer
+
+    CODEC = 2
     DIMENSION = 4
+    FPS = 6
+
     def initialize video
       @video = video
       @avconv = Command.new :libav, 'avconv'
@@ -58,17 +62,19 @@ module VCSRuby
 
     def fps
       load_probe
-      0.0
+      @fps
     end
 
     def video_codec
       load_probe
-      "TODO"
+
+      @video_codec
     end
 
     def audio_codec
       load_probe
-      "TODO"
+
+      @audio_codec
     end
 
     def grab time, image_path
@@ -85,11 +91,13 @@ private
 
       @cache = @avprobe.execute("'#{@video}'", "2>&1")
       puts @cache if Tools.verbose?
-      parse_dimensions
+
+      parse_video_streams
+      parse_audio_streams
     end
 
-    def parse_dimensions
-      video_stream = split_stream_line(video_streams(@cache).first)
+    def parse_video_streams
+      video_stream = split_stream_line(is_stream?(@cache, /Video/).first)
 
       dimensions = /(\d*)x(\d*) \[PAR (\d*:\d*) DAR (\d*:\d*)\]/.match(video_stream[DIMENSION])
     
@@ -104,10 +112,21 @@ private
         @width = dimensions[1]
         @height = dimensions[2]
       end
+
+      fps = /([\d|.]+) fps/.match(video_stream[FPS])
+      @fps = fps ? fps[1].to_f : 0.0
+
+      @video_codec = video_stream[CODEC]
     end
 
-    def video_streams probe
-      streams(probe).select{ |s| s =~ /Video/ }
+    def parse_audio_streams
+      audio_stream = split_stream_line(is_stream?(@cache, /Audio/).first)
+
+      @audio_codec = audio_stream[CODEC]
+    end
+
+    def is_stream? probe, regex
+      streams(probe).select{ |s| s =~ regex }
     end
 
     def streams probe

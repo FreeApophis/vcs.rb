@@ -15,7 +15,7 @@ module VCSRuby
       @video = video
       @configuration = configuration
 
-      @filters = [method(:resize_filter), method(:timestamp_filter)]
+      @filters = [method(:resize_filter), method(:timestamp_filter), method(:softshadow_filter)]
     end
 
     def capture 
@@ -78,7 +78,7 @@ private
       convert.swap.+
       convert.flatten
       convert.trim
-      convert.repage
+      convert.repage.+
     end
 
     def polaroid_filter

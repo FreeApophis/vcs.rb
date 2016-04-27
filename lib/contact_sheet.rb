@@ -27,10 +27,11 @@ module VCSRuby
       initialize_thumbnails
       capture_thumbnails
       
-      m = montage_thumbs
-      image = MiniMagick::Image.open(m)
+      s = splice_montage(montage_thumbs)
 
-      create_title montage if @title
+      image = MiniMagick::Image.open(s)
+
+      create_title image if @title
       compose_cs image
     end
 
@@ -129,11 +130,11 @@ private
       return file_path
     end
 
-    def splice_montage montage
+    def splice_montage montage_path
       file_path = File::join(@tempdir, 'spliced.png')
       MiniMagick::Tool::Convert.new do |convert|
-        convert << File::join(@tempdir, montage.path)
-        convert.background 'Transparent'
+        convert << montage_path
+        convert.background @configuration.contact_background
         convert.splice '5x10'      
         convert << file_path
       end    
@@ -179,7 +180,7 @@ private
             end
             b.font @configuration.header_font.path
             b.label "File size: #{Tools.to_human_size(File.size(@video))}"
-            b.label "Length: #{@length}"
+            b.label "Length: #{@length.to_timestamp}"
             b.append
             b.crop "#{montage.width}x51+0+0"
           end

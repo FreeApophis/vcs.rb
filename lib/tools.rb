@@ -53,7 +53,7 @@ module VCSRuby
       powers = { 'B'  => 1 << 10, 'KiB' => 1 << 20, 'MiB' => 1 << 30, 'GiB' => 1 << 40, 'TiB' => 1 << 50 }
       powers.each_pair do |prefix, power| 
         if size < power
-          return format('%.2f',size.to_f / (power >> 10)) + prefix
+          return format('%.2f',size.to_f / (power >> 10)) + ' ' + prefix
         end
       end
     end
