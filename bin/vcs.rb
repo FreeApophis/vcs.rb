@@ -32,7 +32,7 @@ options =
 arguments =
 {
     '--capturer' => [:ffmpeg, :libav, :mplayer, :any],
-    '--format' => [:png, :jpeg],
+    '--format' => [:png, :jpg, :jpeg, :tiff],
     '--funky' =>  [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, :random]
 }  
 

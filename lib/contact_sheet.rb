@@ -10,7 +10,7 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :capturer, :signature
+    attr_accessor :capturer, :format, :signature
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :rows, :columns, :number_of_caps, :interval
     attr_reader :length
@@ -115,9 +115,9 @@ module VCSRuby
       create_title image if @title
 
       puts "Adding header and footer..." unless Tools.quiet?
-      final = compose_cs image
+      final = add_header_and_footer image
 
-      filename = File.basename(@video) + '.png'
+      filename = File.basename(@video) + ".#{format.to_s}"
       puts "Done. Output wrote to '#{filename}'" unless Tools.quiet?
       FileUtils.mv(final, filename)
     end
@@ -233,8 +233,8 @@ private
       return file_path
     end
 
-    def compose_cs montage
-      file_path = File::join(@tempdir, "final.png")
+    def add_header_and_footer montage
+      file_path = File::join(@tempdir, "final.#{format}")
       header_height = @configuration.header_font.line_height * 3
       signature_height = @configuration.signature_font.line_height + 8
       MiniMagick::Tool::Convert.new do |convert|
