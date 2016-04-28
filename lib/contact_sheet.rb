@@ -10,12 +10,13 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :thumbnail_width, :thumbnail_height, :capturer
+    attr_accessor :thumbnail_width, :thumbnail_height, :capturer, :signature
+    attr_reader :rows, :columns, :number_of_caps, :interval
     attr_reader :length
       
     def initialize video
       @configuration = Configuration.new
-
+      @signature = "Created by Video Contact Sheet Ruby"
       initialize_capturers video
       puts "Processing #{File.basename(video)}..." unless Tools.quiet?
       detect_video_properties
@@ -23,6 +24,72 @@ module VCSRuby
       @thumbnails = []
 
       @tempdir = Dir.mktmpdir
+
+      ObjectSpace.define_finalizer(self, self.class.finalize(@tempdir) )
+
+      initialize_geometry(@configuration.rows, @configuration.columns, @configuration.number_of_caps, @configuration.interval)
+    end
+
+    def initialize_geometry(rows, columns, number_of_caps, interval)
+      if rows && columns
+        puts "geometry based on rows and columns set..."
+        rows = rows.to_i
+        columns = columns.to_i
+        @rows = rows
+        @columns = columns
+        @number_of_caps = rows * columns
+        @interval = @length / (rows * columns)
+        return
+      end
+      if number_of_caps && columns
+        puts "geometry based on caps and columns set..."
+        number_of_caps = number_of_caps.to_i
+        columns = columns.to_i
+        @rows = (number_of_caps / columns).to_i
+        @columns = columns
+        @number_of_caps = number_of_caps
+        @interval = @length / number_of_caps
+        return
+      end
+      if number_of_caps && rows
+        puts "geometry based on caps and rows set..."
+        number_of_caps = number_of_caps.to_i
+        rows = rows.to_i
+        @rows = rows
+        @columns = (number_of_caps / rows).to_i
+        @number_of_caps = number_of_caps
+        @interval = @length / number_of_caps
+        return
+      end
+      if interval && columns
+        puts "geometry based on interval and columns set..."
+        inteval = TimeIndex.new interval
+        columns = columns.to_i
+        @number_of_caps = (@length / interval).to_i
+        @rows = (@number_of_caps / columns).to_i
+        @columns = columns
+        @interval = interval
+        return
+      end
+      if interval && rows
+        puts "geometry based on interval and rows set..."
+        inteval = TimeIndex.new interval
+        rows = rows.to_i
+        @number_of_caps = (@length / interval).to_i
+        @rows = rows
+        @columns = (@number_of_caps / rows).to_i
+        @interval = interval
+        return
+      end
+
+      raise "At least two useful geometry parameters must be set."
+    end
+
+    def self.finalize(tempdir)
+      proc do
+        puts "Cleaning up..." unless Tools.quiet?
+        FileUtils.rm_r tempdir
+      end
     end
 
     def build
@@ -37,32 +104,13 @@ module VCSRuby
       create_title image if @title
 
       puts "Adding header and footer..." unless Tools.quiet?
-      compose_cs image
-      puts "Done. Output wrote to 2d.mp4.png" unless Tools.quiet?
-      #FileUtils.mv()
-      puts "Cleaning up..." unless Tools.quiet?
-      #FileUtils.rm()
+      final = compose_cs image
+
+      filename = File.basename(@video) + '.png'
+      puts "Done. Output wrote to '#{filename}'" unless Tools.quiet?
+      FileUtils.mv(final, filename)
     end
 
-    attr_writer :rows
-    def rows
-      @rows || @configuration.rows || raise("ROW")
-    end
-
-    attr_writer :columns
-    def columns
-      @rows || @configuration.columns || raise("COLUMNS")
-    end
-
-    attr_writer :number_of_caps
-    def number_of_caps
-      @number_of_caps || raise("CAPS")
-    end
-
-    attr_writer :interval
-    def interval
-      @length / number_of_caps
-    end
 
 private
     def selected_capturer
@@ -157,7 +205,7 @@ private
       MiniMagick::Tool::Convert.new do |convert|
         convert.stack do |ul|
           ul.size "#{montage.width}x#{@title_font.line_height}"
-          ul << 'xc:White'
+          ul.xc @configuration.title_background
           ul.font @configuration.title_font.path
           ul.pointsize @configuration.title_font.size
           ul.background @configuration.title_background
@@ -172,6 +220,8 @@ private
 
     def compose_cs montage
       file_path = File::join(@tempdir, "final.png")
+      header_height = @configuration.header_font.line_height * 3
+      signature_height = @configuration.signature_font.line_height + 8
       MiniMagick::Tool::Convert.new do |convert|
         convert.stack do |a|
           a.size "#{montage.width - 18}x1"
@@ -193,11 +243,11 @@ private
             b.label "File size: #{Tools.to_human_size(File.size(@video))}"
             b.label "Length: #{@length.to_timestamp}"
             b.append
-            b.crop "#{montage.width}x51+0+0"
+            b.crop "#{montage.width}x#{header_height}+0+0"
           end
           a.append
           a.stack do |b|
-            b.size "#{montage.width}x51"
+            b.size "#{montage.width}x#{header_height}"
             b.gravity 'East'
             b.fill @configuration.header_color
             b.annotate '+0-1'
@@ -209,13 +259,13 @@ private
         convert << montage.path
         convert.append
         convert.stack do |a|
-          a.size "#{montage.width}x28"
+          a.size "#{montage.width}x#{signature_height}"
           a.gravity 'Center'
           a.xc @configuration.signature_background
           a.font @configuration.signature_font.path
           a.pointsize @configuration.signature_font.size
           a.fill @configuration.signature_color
-          a.annotate(0, 'Preview created by vcs.rb')
+          a.annotate(0, @signature)
         end
         convert.append
         convert << file_path

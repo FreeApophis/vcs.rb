@@ -1,6 +1,8 @@
 main:
   rows: 4
   columns: 4
+  interval: ~
+  number_of_caps: ~
 style:
   header:
     font: DejaVu-Sans-Book

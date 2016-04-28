@@ -39,14 +39,14 @@ module VCSRuby
       sheet = VCSRuby::ContactSheet.new video
       sheet.capturer = options[:capturer] if options[:capturer]
 
-      sheet.rows = options[:rows].to_i if options[:rows]
-      sheet.columns = options[:columns].to_i if options[:columns]
-      sheet.number_of_caps = options[:numcaps].to_i if options[:numcaps]
+      if options[:rows] || options[:columns] || options[:numcaps] || options[:interval]
+        sheet.initialize_geometry(options[:rows], options[:columns], options[:numcaps], options[:interval])
+      end
 
       sheet.thumbnail_width = options[:width] if options[:width]
       sheet.thumbnail_height = options[:height] if options[:height]
 
-      sheet
+      return sheet
     end
 
     def self.to_human_size size

@@ -89,7 +89,11 @@ module VCSRuby
     end
 
     def / operand
-      TimeIndex.new @total_seconds / operand
+      if operand.instance_of? Fixnum
+        TimeIndex.new @total_seconds / operand
+      else
+        @total_seconds / operand.total_seconds
+      end
     end
 
     def to_s

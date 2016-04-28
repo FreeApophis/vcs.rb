@@ -135,8 +135,5 @@ Tools::quiet = options[:quiet]
 ARGV.each do |video|
   sheet = Tools::contact_sheet_with_options video, options
   sheet.build
-
-  puts sheet.thumbnail_width
-  puts sheet.thumbnail_height
 end
 

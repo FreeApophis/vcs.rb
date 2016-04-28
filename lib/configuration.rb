@@ -29,11 +29,19 @@ module VCSRuby
     end
 
     def rows
-      @config['main']['rows'].to_i
+      @config['main']['rows']
     end
 
     def columns
-      @config['main']['columns'].to_i
+      @config['main']['columns']
+    end
+
+    def number_of_caps
+      @config['main']['number_of_caps']
+    end
+
+    def interval
+      @config['main']['interval']
     end
 
     def header_background
