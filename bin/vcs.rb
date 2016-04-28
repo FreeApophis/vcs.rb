@@ -124,8 +124,6 @@ Tools::print_help optparse if ARGV.empty?
   
 optparse.parse!
 
-puts options.inspect
-
 Tools::print_help optparse if options[:help] || ARGV.empty?
 
 Tools::verbose = options[:verbose]

@@ -6,12 +6,12 @@ main:
   quality: 95
 style:
   header:
-    font: DejaVu-Sans-Book
+    font: DejaVuSans.ttf
     size: 14
     color: Black
     background: "#afcd7a"
   title:
-    font: DejaVu-Sans-Book
+    font: DejaVuSans.ttf
     size: 33
     color: Black
     background: White
@@ -20,12 +20,12 @@ style:
   contact:
     background: White
   timestamp:
-    font: DejaVu-Sans-Book
+    font: DejaVuSans.ttf
     size: 14
     color: White
     background: "#000000aa"
   signature:
-    font: DejaVu-Sans-Book
+    font: DejaVuSans.ttf
     size: 10
     color: Black
     background: SlateGray

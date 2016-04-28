@@ -15,7 +15,8 @@ module VCSRuby
     end
 
     def find_path
-      '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
+      font = `fc-list | grep #{name}`
+      font.split(':').first.strip
     end
 
     def line_height
