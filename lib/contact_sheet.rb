@@ -53,7 +53,11 @@ module VCSRuby
       if @has_interval
         (@to - @from) / @interval
       else
-        @rows * @columns
+        if @rows && @columns
+          @rows * @columns
+        else
+          raise "you need at least 2 parameters from columns, rows and interval"
+        end
       end
     end
 
@@ -111,12 +115,14 @@ module VCSRuby
 
 private
     def selected_capturer
+      result = nil
       if @capturer == nil || @capturer == :any
-        return @capturers.first
+        result = @capturers.first
       else
-        return @capturers.select{ |c| c.name == @capturer }
+        result =  @capturers.select{ |c| c.name == @capturer }.first
       end
-      raise "Selected Capturer (#{@capturer}) not available"
+      raise "Selected Capturer (#{@capturer.to_s}) not available" unless result
+      return result
     end
 
     def initialize_capturers video
@@ -151,7 +157,7 @@ private
       @thumbnails.each_with_index do |thumbnail, i|
         puts "Generating capture ##{i + 1}/#{@number_of_caps} #{thumbnail.time}..." unless Tools::quiet?
         if @configuration.blank_evasion?
-          thumbnail.capture_and_evade @interval
+          thumbnail.capture_and_evade interval
         else
           thumbnail.capture
         end

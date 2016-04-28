@@ -125,9 +125,12 @@ Tools::quiet = options[:quiet]
 
 # Invoke ContactSheet
 
-puts options.inspect
-ARGV.each do |video|
-  sheet = Tools::contact_sheet_with_options video, options
-  sheet.build
+begin
+  ARGV.each do |video|
+    sheet = Tools::contact_sheet_with_options video, options
+    sheet.build
+  end
+rescue Exception => e
+  STDERR.puts "ERROR: #{e.message}"
 end
 
