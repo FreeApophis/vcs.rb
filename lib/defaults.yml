@@ -15,6 +15,8 @@ style:
     size: 33
     color: Black
     background: White
+  highlight:
+    background: LightGoldenRod 
   contact:
     background: White
   timestamp:

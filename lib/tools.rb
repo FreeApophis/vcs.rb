@@ -50,6 +50,7 @@ module VCSRuby
       sheet.thumbnail_height = options[:height] if options[:height]
       sheet.from = options[:from] if options[:from]
       sheet.to = options[:to] if options[:to]
+      sheet.highlight = options[:highlight] if options[:highlight]
 
       return sheet
     end

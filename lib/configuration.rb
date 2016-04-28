@@ -64,6 +64,10 @@ module VCSRuby
       @config['style']['title']['color']
     end
 
+    def highlight_background
+      @config['style']['highlight']['background']
+    end
+
     def contact_background
       @config['style']['contact']['background']
     end

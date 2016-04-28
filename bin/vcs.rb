@@ -41,7 +41,7 @@ arguments =
 optparse = OptionParser.new do|opts| 
   opts.separator $vcs_ruby_name + ' ' + $vcs_ruby_version.to_s
   opts.separator ''
-  opts.on( '-i [INTERVAL]', '--interval [INTERVAL]', 'Set the interval to arg in seconds') do |interval|
+  opts.on( '-i [INTERVAL]', '--interval [INTERVAL]', 'Set the interval [INTERVAL]') do |interval|
     options[:interval] = TimeIndex.new interval
   end
   opts.on( '-c [COLMNS]', '--columns [COLUMNS]', 'Arrange the output in <COLUMNS> columns.') do |columns|
@@ -85,6 +85,9 @@ optparse = OptionParser.new do|opts|
   end
   opts.on( '--no-signature', 'Remove footer with signature') do 
     options[:no_signature] = true
+  end
+  opts.on( '-l [HIGHLIGHT]', '--highlight [HIGHLIGHT]' 'Add the frame found at timestamp [HIGHLIGHT] as a highlight.') do |highlight|
+    options[:highlight] = TimeIndex.new highlight
   end
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
     options[:quiet] = true

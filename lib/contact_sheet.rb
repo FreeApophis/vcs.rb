@@ -10,7 +10,7 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :capturer, :format, :signature, :title
+    attr_accessor :capturer, :format, :signature, :title, :highlight
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
       
@@ -173,7 +173,7 @@ private
       puts "Capturing in range [#{from}..#{to}]. Total length: #{@length}" unless Tools.quiet?
 
       @thumbnails.each_with_index do |thumbnail, i|
-        puts "Generating capture ##{i + 1}/#{@number_of_caps} #{thumbnail.time}..." unless Tools::quiet?
+        puts "Generating capture ##{i + 1}/#{number_of_caps} #{thumbnail.time}..." unless Tools::quiet?
         if @configuration.blank_evasion?
           thumbnail.capture_and_evade interval
         else
@@ -245,6 +245,37 @@ private
       return file_path
     end
 
+    def create_highlight montage
+      puts "Generating highlight..."
+      thumb = Thumbnail.new selected_capturer, @video, @configuration
+
+      thumb.width = thumbnail_width
+      thumb.height = thumbnail_height
+      thumb.time = @highlight
+      thumb.image_path = File::join(@tempdir, "highlight_thumb.png")
+      thumb.capture
+      thumb.apply_filters
+
+      file_path =  File::join(@tempdir, "highlight.png")
+      MiniMagick::Tool::Convert.new do |convert|
+        convert.stack do |a|
+          a.size "#{montage.width}x#{thumbnail_height+20}"
+          a.xc @configuration.highlight_background
+          a.gravity 'Center'
+          a << thumb.image_path
+          a.composite
+        end
+        convert.stack do |a|
+          a.size "#{montage.width}x1"
+          a.xc 'Black'
+        end
+        convert.append
+        convert << file_path
+      end
+
+      file_path
+    end
+
     def add_header_and_footer montage
       file_path = File::join(@tempdir, filename)
       header_height = @configuration.header_font.line_height * 3
@@ -284,6 +315,7 @@ private
           a.border 9
         end
         convert << create_title(montage) if @title
+        convert << create_highlight(montage) if @highlight
         convert << montage.path
         convert.append
         if @signature
