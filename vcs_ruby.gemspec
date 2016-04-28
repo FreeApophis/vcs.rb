@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version     = VCSRuby::update_version
   s.date        = '2016-04-19'
   s.summary     = "Generates contact sheets of videos"
-  s.description = "Creates a contact sheet of a video, usable as library or as a script. Based on VCS *NIX"
+  s.description = "Creates a contact sheet, a preview, of a video, usable as library or as a script. Based on VCS *NIX. Creating Thumbnails with libav, ffmpeg or mplayer and compose it with ImageMagick into nice looking sheets."
   s.authors     = ["Thomas Bruderer"]
   s.email       = 'apophis@apophis.ch'
   s.files       = Dir['lib/*']
@@ -16,6 +16,6 @@ Gem::Specification.new do |s|
   s.license       = 'GPL3'
   
   s.required_ruby_version = '>= 1.8.6'
-  s.add_dependency 'minimagick'
+  s.add_dependency 'mini_magick', '>= 4.0.0'
   s.requirements << 'libav or ffmpeg or mplayer'
 end
