@@ -2,6 +2,7 @@ main:
   rows: 4
   columns: 4 
   interval: ~
+  padding: 2
 style:
   header:
     font: DejaVu-Sans-Book

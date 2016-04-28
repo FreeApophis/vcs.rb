@@ -40,6 +40,10 @@ module VCSRuby
       @config['main']['interval'] ? TimeIndex.new(@config['main']['interval']) : nil
     end
 
+    def padding
+      @config['main']['padding'] ? @config['main']['padding'].to_i : 2
+    end
+
     def header_background
       @config['style']['header']['background']
     end

@@ -190,8 +190,9 @@ private
         @thumbnails.each do |thumbnail|
           montage << thumbnail.image_path
         end
-        montage.geometry "+#{2}+#{2}"             # padding
-        montage.tile "#{@columns}x#{@rows}"       # rows or columns can be nil (auto fit)
+        montage.geometry "+#{@configuration.padding}+#{@configuration.padding}"
+        # rows or columns can be nil (auto fit)
+        montage.tile "#{@columns}x#{@rows}" 
         montage << file_path
       end
       return file_path
