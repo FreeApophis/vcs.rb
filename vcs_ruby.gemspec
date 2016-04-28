@@ -1,7 +1,7 @@
 require File.expand_path("lib/version", File.dirname(__FILE__))
 
 Gem::Specification.new do |s|
-  s.name        = 'vcs.rb'
+  s.name        = 'vcs_ruby'
   s.version     = VCSRuby::update_version
   s.date        = '2016-04-19'
   s.summary     = "Generates contact sheets of videos"

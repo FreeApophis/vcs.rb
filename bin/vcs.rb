@@ -113,11 +113,10 @@ optparse = OptionParser.new do|opts|
   opts.separator '  "output.jpg":'
   opts.separator '  $ vcs -i 3m30 input.wmv -o output.jpg'
   opts.separator ''
-  opts.separator '  Create a sheet with vidcaps starting at 3 mins and ending at 18 mins,'
-  opts.separator '  add an extra vidcap at 2m and another one at 19m:'
-  opts.separator '  $ vcs -f 3m -t 18m -S2m -S 19m input.avi'
+  opts.separator '  Create a sheet with vidcaps starting at 3 mins and ending at 18 mins in 2m intervals'
+  opts.separator '  $ vcs --from 3m --to 18m -i 2m input.avi'
   opts.separator ''
-  opts.separator '  See more examples at vcs-ruby homepage <>.'
+  opts.separator '  See more examples at vcs-ruby homepage <https://github.com/FreeApophis/vcs.rb>.'
   opts.separator ''
 end
 
