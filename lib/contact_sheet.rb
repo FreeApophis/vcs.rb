@@ -19,6 +19,7 @@ module VCSRuby
       @configuration = Configuration.new
       @signature = "Created by Video Contact Sheet Ruby"
       initialize_capturers video
+      initialize_filename(File.basename(@video, '.*'))
       puts "Processing #{File.basename(video)}..." unless Tools.quiet?
       detect_video_properties
       
@@ -29,6 +30,23 @@ module VCSRuby
       ObjectSpace.define_finalizer(self, self.class.finalize(@tempdir) )
 
       initialize_geometry(@configuration.rows, @configuration.columns, @configuration.interval)
+    end
+
+    def initialize_filename filename
+      @out_path = File.dirname(filename)
+      @out_filename = File.basename(filename,'.*')
+      ext = File.extname(filename).gsub('.', '')
+      if ['png', 'jpg', 'jpeg', 'tiff'].include?(ext)
+        @format ||= ext.to_sym
+      end
+    end
+
+    def filename
+      "#{@out_filename}.#{@format ? @format.to_s : 'png'}"
+    end
+
+    def full_path
+      File.join(@out_path, filename)
     end
 
     def initialize_geometry(rows, columns, interval)
@@ -108,9 +126,8 @@ module VCSRuby
       puts "Adding header and footer..." unless Tools.quiet?
       final = add_header_and_footer image
 
-      filename = File.basename(@video) + ".#{format.to_s}"
       puts "Done. Output wrote to '#{filename}'" unless Tools.quiet?
-      FileUtils.mv(final, filename)
+      FileUtils.mv(final, full_path)
     end
 
 
@@ -229,7 +246,7 @@ private
     end
 
     def add_header_and_footer montage
-      file_path = File::join(@tempdir, "final.#{format}")
+      file_path = File::join(@tempdir, filename)
       header_height = @configuration.header_font.line_height * 3
       signature_height = @configuration.signature_font.line_height + 8
       MiniMagick::Tool::Convert.new do |convert|
@@ -281,7 +298,7 @@ private
           end
           convert.append
         end
-        if format == :jpg || format == :png
+        if format == :jpg || format == :jpeg
           convert.quality(@configuration.quality)
         end
         convert << file_path

@@ -24,7 +24,8 @@ options =
              quiet: false, 
            verbose: false, 
           capturer: :any,
-            format: :png
+            format: nil,
+            output: []
 }
 
 # Command Line Parameter arguments
@@ -77,7 +78,7 @@ optparse = OptionParser.new do|opts|
     options[:title] = title
   end
   opts.on( '-o [FILE]', '--output [FILE]', 'File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.') do |file|
-    options[:output] = file
+    options[:output] << file
   end
   opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Change the image signature to your preference.') do |signature|
     options[:signature] = signature
@@ -121,6 +122,8 @@ Tools::print_help optparse if ARGV.empty?
   
 optparse.parse!
 
+puts options.inspect
+
 Tools::print_help optparse if options[:help] || ARGV.empty?
 
 Tools::verbose = options[:verbose]
@@ -129,8 +132,9 @@ Tools::quiet = options[:quiet]
 # Invoke ContactSheet
 
 begin
-  ARGV.each do |video|
+  ARGV.each_with_index do |video, index|
     sheet = Tools::contact_sheet_with_options video, options
+    sheet.initialize_filename(options[:output][index]) if options[:output][index]
     sheet.build
   end
 rescue Exception => e
