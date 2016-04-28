@@ -64,12 +64,10 @@ private
       convert.stack do |box|
         box.box @configuration.timestamp_background
         box.fill  @configuration.timestamp_color
-        box.stroke 'None'
         box.pointsize @configuration.timestamp_font.size
         box.gravity 'SouthEast'
         box.font @configuration.timestamp_font.path
-        box.strokewidth 3
-        box.annotate('+5+5', @time.to_timestamp)
+        box.annotate('+10+10', " #{@time.to_timestamp} ")
       end
       convert.flatten
       convert.gravity 'None'
