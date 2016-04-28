@@ -4,10 +4,11 @@
 
 module VCSRuby
   class TimeIndex
+    include Comparable
     attr_reader :total_seconds
 
     def initialize time_index = ''
-      if time_index.instance_of? Float
+      if time_index.instance_of? Float or time_index.instance_of? Fixnum
         @total_seconds = time_index
       else
         @total_seconds = 0.0 
@@ -57,15 +58,15 @@ module VCSRuby
     end
 
     def hours
-      (@total_seconds / 3600).to_i
+      (@total_seconds.abs / 3600).to_i
     end
 
     def minutes
-      ((@total_seconds / 60) % 60).to_i
+      ((@total_seconds.abs / 60) % 60).to_i
     end
 
     def seconds
-      @total_seconds % 60
+      @total_seconds.abs % 60
     end
 
     def + operand
@@ -96,15 +97,24 @@ module VCSRuby
       end
     end
 
+    def <=> operand
+      @total_seconds <=> operand.total_seconds
+    end
+
+    def sign
+      return '-' if @total_seconds < 0
+      ''
+    end
+
     def to_s
-      "#{hours}h#{"%02d" % minutes}m#{"%02d" % seconds}s"
+      "#{sign}#{hours}h#{"%02d" % minutes}m#{"%02d" % seconds}s"
     end
 
     def to_timestamp
       if hours == 0
-        "#{"%02d" % minutes}:#{"%02d" % seconds}"
+        "#{sign}#{"%02d" % minutes}:#{"%02d" % seconds}"
       else
-        "#{hours}:#{"%02d" % minutes}:#{"%02d" % seconds}"
+        "#{sign}#{hours}:#{"%02d" % minutes}:#{"%02d" % seconds}"
       end
     end
   end

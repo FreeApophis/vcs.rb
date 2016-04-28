@@ -80,8 +80,16 @@ module VCSRuby
       @config['style']['signature']['color']
     end
 
-    def blank_threashold
+    def blank_threshold
       @config['lowlevel']['blank_threshold'].to_f
+    end
+
+    def blank_evasion?
+      @config['lowlevel']['blank_evasion']
+    end
+
+    def blank_alternatives
+      @config['lowlevel']['blank_alternatives'].map{ |e| TimeIndex.new e.to_i }
     end
   end
  end

@@ -22,6 +22,20 @@ module VCSRuby
       @capper.grab @time, @image_path
     end
 
+    def capture_and_evade interval
+      times = [TimeIndex.new] + @configuration.blank_alternatives
+      times.select! { |t| (t < interval / 2) and (t > interval / -2) }
+      times.map! { |t| @time + t }
+
+      times.each do |time|
+        @time = time
+        capture
+        break unless blank?
+        puts "Blank frame detected. => #{@time}" unless Tools::quiet?
+        puts "Giving up!" if time == times.last && !Tools::quiet?
+      end
+    end
+
     def blank?
       image = MiniMagick::Image.open @image_path
       image.colorspace 'Gray'

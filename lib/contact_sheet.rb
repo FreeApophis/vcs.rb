@@ -152,8 +152,12 @@ private
       puts "Capturing in range [TODO]. Total length: #{@length}" unless Tools.quiet?
 
       @thumbnails.each_with_index do |thumbnail, i|
-        puts "Generating capture #{i + 1}/#{@number_of_caps}" unless Tools::quiet?
-        thumbnail.capture
+        puts "Generating capture ##{i + 1}/#{@number_of_caps} #{thumbnail.time}..." unless Tools::quiet?
+        if @configuration.blank_evasion?
+          thumbnail.capture_and_evade @interval
+        else
+          thumbnail.capture
+        end
         thumbnail.apply_filters
       end
     end
