@@ -29,19 +29,15 @@ module VCSRuby
     end
 
     def rows
-      @config['main']['rows']
+      @config['main']['rows'] ? @config['main']['rows'].to_i : nil
     end
 
     def columns
-      @config['main']['columns']
-    end
-
-    def number_of_caps
-      @config['main']['number_of_caps']
+      @config['main']['columns'] ? @config['main']['columns'].to_i : nil
     end
 
     def interval
-      @config['main']['interval']
+      @config['main']['interval'] ? TimeIndex.new(@config['main']['interval']) : nil
     end
 
     def header_background

@@ -12,8 +12,7 @@ module VCSRuby
   class ContactSheet 
     attr_accessor :capturer, :format, :signature, :title
     attr_reader :thumbnail_width, :thumbnail_height
-    attr_reader :rows, :columns, :number_of_caps, :interval
-    attr_reader :length
+    attr_reader :length, :from, :to
       
     def initialize video
       @configuration = Configuration.new
@@ -28,62 +27,34 @@ module VCSRuby
 
       ObjectSpace.define_finalizer(self, self.class.finalize(@tempdir) )
 
-      initialize_geometry(@configuration.rows, @configuration.columns, @configuration.number_of_caps, @configuration.interval)
+      initialize_geometry(@configuration.rows, @configuration.columns, @configuration.interval)
     end
 
-    def initialize_geometry(rows, columns, number_of_caps, interval)
-      if rows && columns
-        puts "geometry based on rows and columns set..."
-        rows = rows.to_i
-        columns = columns.to_i
-        @rows = rows
-        @columns = columns
-        @number_of_caps = rows * columns
-        @interval = @length / (rows * columns)
-        return
-      end
-      if number_of_caps && columns
-        puts "geometry based on caps and columns set..."
-        number_of_caps = number_of_caps.to_i
-        columns = columns.to_i
-        @rows = (number_of_caps / columns).to_i
-        @columns = columns
-        @number_of_caps = number_of_caps
-        @interval = @length / number_of_caps
-        return
-      end
-      if number_of_caps && rows
-        puts "geometry based on caps and rows set..."
-        number_of_caps = number_of_caps.to_i
-        rows = rows.to_i
-        @rows = rows
-        @columns = (number_of_caps / rows).to_i
-        @number_of_caps = number_of_caps
-        @interval = @length / number_of_caps
-        return
-      end
-      if interval && columns
-        puts "geometry based on interval and columns set..."
-        inteval = TimeIndex.new interval
-        columns = columns.to_i
-        @number_of_caps = (@length / interval).to_i
-        @rows = (@number_of_caps / columns).to_i
-        @columns = columns
-        @interval = interval
-        return
-      end
-      if interval && rows
-        puts "geometry based on interval and rows set..."
-        inteval = TimeIndex.new interval
-        rows = rows.to_i
-        @number_of_caps = (@length / interval).to_i
-        @rows = rows
-        @columns = (@number_of_caps / rows).to_i
-        @interval = interval
-        return
-      end
+    def initialize_geometry(rows, columns, interval)
+      @has_interval = !!interval
+      @rows = rows
+      @columns = columns
+      @interval = interval
+    end
 
-      raise "At least two useful geometry parameters must be set."
+    def rows 
+      @rows
+    end
+
+    def columns
+      @columns
+    end
+
+    def interval
+      @interval || (@to - @from) / number_of_caps
+    end
+
+    def number_of_caps
+      if @has_interval
+        (@to - @from) / @interval
+      else
+        @rows * @columns
+      end
     end
 
     def thumbnail_width= width
@@ -95,6 +66,23 @@ module VCSRuby
       @thumbnail_width = (height.to_f / @thumbnail_height * thumbnail_width).to_i
       @thumbnail_height = height
     end
+
+    def from= time
+      if (TimeIndex.new(0) < time) && (time < to) && (time < @length)
+        @from = time
+      else
+        raise "Invalid From Time"
+      end
+    end
+
+    def to= time
+      if (TimeIndex.new(0) < time) && (from < time) && (time < @length)
+        @to = time
+      else
+        raise "Invalid To Time"
+      end
+    end
+ 
 
     def self.finalize(tempdir)
       proc do
@@ -144,7 +132,7 @@ private
     end
 
     def initialize_thumbnails
-      time = TimeIndex.new 0.0
+      time = @from
       (1..number_of_caps).each do |i|
         thumb = Thumbnail.new selected_capturer, @video, @configuration
 
@@ -158,7 +146,7 @@ private
     end
 
     def capture_thumbnails
-      puts "Capturing in range [TODO]. Total length: #{@length}" unless Tools.quiet?
+      puts "Capturing in range [#{from}..#{to}]. Total length: #{@length}" unless Tools.quiet?
 
       @thumbnails.each_with_index do |thumbnail, i|
         puts "Generating capture ##{i + 1}/#{@number_of_caps} #{thumbnail.time}..." unless Tools::quiet?
@@ -195,8 +183,8 @@ private
         @thumbnails.each do |thumbnail|
           montage << thumbnail.image_path
         end
-        montage.geometry "+#{2}+#{2}"             # Zwischenraum
-        montage.tile "#{@columns}x#{@rows}" # 
+        montage.geometry "+#{2}+#{2}"             # padding
+        montage.tile "#{@columns}x#{@rows}"       # rows or columns can be nil (auto fit)
         montage << file_path
       end
       return file_path

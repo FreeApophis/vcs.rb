@@ -43,9 +43,6 @@ optparse = OptionParser.new do|opts|
   opts.on( '-i [INTERVAL]', '--interval [INTERVAL]', 'Set the interval to arg in seconds') do |interval|
     options[:interval] = TimeIndex.new interval
   end
-  opts.on( '-n [CAPS]', '--numcaps [CAPS]', 'Set the number of captured images to arg. Use either -i or -n') do |numcaps|
-    options[:numcaps] = numcaps.to_i
-  end
   opts.on( '-c [COLMNS]', '--columns [COLUMNS]', 'Arrange the output in <COLUMNS> columns.') do |columns|
     options[:columns] = columns.to_i
   end

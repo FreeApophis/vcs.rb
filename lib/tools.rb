@@ -41,12 +41,14 @@ module VCSRuby
       sheet.format = options[:format] if options[:format]
       sheet.title = options[:title] if options[:title]
 
-      if options[:rows] || options[:columns] || options[:numcaps] || options[:interval]
-        sheet.initialize_geometry(options[:rows], options[:columns], options[:numcaps], options[:interval])
+      if options[:rows] || options[:columns] || options[:interval]
+        sheet.initialize_geometry(options[:rows], options[:columns], options[:interval])
       end
 
       sheet.thumbnail_width = options[:width] if options[:width]
       sheet.thumbnail_height = options[:height] if options[:height]
+      sheet.from = options[:from] if options[:from]
+      sheet.to = options[:to] if options[:to]
 
       return sheet
     end
