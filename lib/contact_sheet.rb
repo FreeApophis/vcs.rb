@@ -14,7 +14,8 @@ module VCSRuby
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
       
-    def initialize video
+    def initialize video, capturer = :any
+      @capturer = capturer
       @configuration = Configuration.new
       @signature = "Created by Video Contact Sheet Ruby"
       initialize_capturers video
@@ -46,7 +47,7 @@ module VCSRuby
     end
 
     def interval
-      @interval || (@to - @from) / number_of_caps
+      @interval || (@to - @from) / (number_of_caps + 1)
     end
 
     def number_of_caps
@@ -259,7 +260,7 @@ private
             b.gravity 'East'
             b.fill @configuration.header_color
             b.annotate '+0-1'
-            b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{selected_capturer.fps}"
+            b << "Dimensions: #{selected_capturer.width}x#{selected_capturer.height}\nFormat: #{selected_capturer.video_codec} / #{selected_capturer.audio_codec}\nFPS: #{"%.02f" % selected_capturer.fps}"
           end
           a.bordercolor @configuration.header_background
           a.border 9
