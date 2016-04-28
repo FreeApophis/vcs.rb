@@ -109,8 +109,8 @@ private
       end
 
       if dimensions
-        @width = dimensions[1]
-        @height = dimensions[2]
+        @width = dimensions[1].to_i
+        @height = dimensions[2].to_i
       end
 
       fps = /([\d|.]+) fps/.match(video_stream[FPS])

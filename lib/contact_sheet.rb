@@ -10,7 +10,8 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :thumbnail_width, :thumbnail_height, :capturer, :signature
+    attr_accessor :capturer, :signature
+    attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :rows, :columns, :number_of_caps, :interval
     attr_reader :length
       
@@ -83,6 +84,16 @@ module VCSRuby
       end
 
       raise "At least two useful geometry parameters must be set."
+    end
+
+    def thumbnail_width= width
+      @thumbnail_height = (width.to_f / @thumbnail_width * thumbnail_height).to_i
+      @thumbnail_width = width
+    end
+
+    def thumbnail_height= height
+      @thumbnail_width = (height.to_f / @thumbnail_height * thumbnail_width).to_i
+      @thumbnail_height = height
     end
 
     def self.finalize(tempdir)
