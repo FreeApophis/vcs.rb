@@ -10,7 +10,7 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet 
-    attr_accessor :capturer, :format, :signature
+    attr_accessor :capturer, :format, :signature, :title
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :rows, :columns, :number_of_caps, :interval
     attr_reader :length
@@ -111,8 +111,6 @@ module VCSRuby
       s = splice_montage(montage_thumbs)
 
       image = MiniMagick::Image.open(s)
-
-      create_title image if @title
 
       puts "Adding header and footer..." unless Tools.quiet?
       final = add_header_and_footer image
@@ -215,20 +213,21 @@ private
       file_path
      end
 
-    def create_title montage, title
+    def create_title montage
       file_path = File::join(@tempdir, 'title.png')
       MiniMagick::Tool::Convert.new do |convert|
         convert.stack do |ul|
-          ul.size "#{montage.width}x#{@title_font.line_height}"
+          ul.size "#{montage.width}x#{@configuration.title_font.line_height}"
           ul.xc @configuration.title_background
           ul.font @configuration.title_font.path
           ul.pointsize @configuration.title_font.size
           ul.background @configuration.title_background
           ul.fill @configuration.title_color
           ul.gravity 'Center'
-          ul.annotate(0, title)
+          ul.annotate(0, @title)
         end
         convert.flatten
+        convert << file_path
       end
       return file_path
     end
@@ -271,6 +270,7 @@ private
           a.bordercolor @configuration.header_background
           a.border 9
         end
+        convert << create_title(montage) if @title
         convert << montage.path
         convert.append
         convert.stack do |a|
