@@ -79,8 +79,11 @@ optparse = OptionParser.new do|opts|
   opts.on( '-o [FILE]', '--output [FILE]', 'File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.') do |file|
     options[:output] = file
   end
-  opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Image signature!') do |signature|
+  opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Change the image signature to your preference.') do |signature|
     options[:signature] = signature
+  end
+  opts.on( '--no-signature', 'Remove footer with signature') do 
+    options[:no_signature] = true
   end
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
     options[:quiet] = true

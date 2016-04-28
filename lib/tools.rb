@@ -39,6 +39,8 @@ module VCSRuby
       sheet = VCSRuby::ContactSheet.new video, options[:capturer]
       sheet.format = options[:format] if options[:format]
       sheet.title = options[:title] if options[:title]
+      sheet.signature = options[:signature] if options[:signature]
+      sheet.signature = nil if options[:no_signature]
 
       if options[:rows] || options[:columns] || options[:interval]
         sheet.initialize_geometry(options[:rows], options[:columns], options[:interval])

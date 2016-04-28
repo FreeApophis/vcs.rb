@@ -269,16 +269,18 @@ private
         convert << create_title(montage) if @title
         convert << montage.path
         convert.append
-        convert.stack do |a|
-          a.size "#{montage.width}x#{signature_height}"
-          a.gravity 'Center'
-          a.xc @configuration.signature_background
-          a.font @configuration.signature_font.path
-          a.pointsize @configuration.signature_font.size
-          a.fill @configuration.signature_color
-          a.annotate(0, @signature)
+        if @signature
+          convert.stack do |a|
+            a.size "#{montage.width}x#{signature_height}"
+            a.gravity 'Center'
+            a.xc @configuration.signature_background
+            a.font @configuration.signature_font.path
+            a.pointsize @configuration.signature_font.size
+            a.fill @configuration.signature_color
+            a.annotate(0, @signature)
+          end
+          convert.append
         end
-        convert.append
         convert << file_path
       end
       file_path
