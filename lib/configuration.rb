@@ -44,6 +44,10 @@ module VCSRuby
       @config['main']['padding'] ? @config['main']['padding'].to_i : 2
     end
 
+    def quality
+      @config['main']['quality'] ? @config['main']['quality'].to_i : 90
+    end
+
     def header_background
       @config['style']['header']['background']
     end

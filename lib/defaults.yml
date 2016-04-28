@@ -3,6 +3,7 @@ main:
   columns: 4 
   interval: ~
   padding: 2
+  quality: 95
 style:
   header:
     font: DejaVu-Sans-Book

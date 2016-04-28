@@ -281,6 +281,9 @@ private
           end
           convert.append
         end
+        if format == :jpg || format == :png
+          convert.quality(@configuration.quality)
+        end
         convert << file_path
       end
       file_path
