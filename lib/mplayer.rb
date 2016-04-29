@@ -9,11 +9,15 @@ module VCSRuby
   class MPlayer < Capturer
     def initialize video
       @video = video
-      @command = Command.new :mplayer, 'mplayer'
+      @mplayer = Command.new :mplayer, 'mplayer'
     end
 
     def name
       :mplayer
+    end
+
+    def available?
+      @mplayer.available?
     end
   end
 end

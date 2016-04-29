@@ -25,7 +25,7 @@ module VCSRuby
     end
 
     def available?
-      @avconv.available && @avprobe.available
+      @avconv.available? && @avprobe.available?
     end
 
     def detect_version

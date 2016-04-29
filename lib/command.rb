@@ -4,11 +4,15 @@
 
 module VCSRuby
   class Command
-    attr_reader :name, :available
+    attr_reader :name
     def initialize name, command
       @name = name
       @command = which(command)
       @available = !!@command
+    end
+
+    def available?
+      @available
     end
 
     def execute parameter, streams = "2> /dev/null"
