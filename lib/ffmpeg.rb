@@ -9,13 +9,14 @@ require 'time_index'
 module VCSRuby
   class FFmpeg < Capturer
 
-    CODEC = 2
-    DIMENSION = 4
-    FPS = 6
+    CODEC = 3
+    DIMENSION = 5
+    FPS = 7
 
     def initialize video
       @video = video
       @ffmpeg = Command.new :ffmpeg, 'ffmpeg'
+      @ffprobe = Command.new :ffmpeg, 'ffprobe'
       detect_version
     end
 
@@ -24,12 +25,18 @@ module VCSRuby
     end
 
     def available?
-      @ffmpeg.available? && false
+      @ffmpeg.available? && !libav?
+    end
+
+    def libav?
+      @libav
     end
 
     def detect_version
       info = @ffmpeg.execute('-version')
       match = /avconv ([\d|.|-|:]*)/.match(info)
+      @libav = true if match
+      match = /ffmpeg version ([\d|.]*)/.match(info)
       if match
         @version = match[1]
       end
@@ -83,14 +90,14 @@ module VCSRuby
     end
 
     def to_s
-      "LibAV #{@version}"
+      "FFmpeg #{@version}"
     end
 
 private
     def load_probe
       return if @cache
 
-      @cache = @ffmpeg.execute("\"#{@video}\"", "2>&1")
+      @cache = @ffprobe.execute("\"#{@video}\"", "2>&1")
       puts @cache if Tools.verbose?
 
       parse_video_streams

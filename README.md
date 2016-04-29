@@ -46,7 +46,7 @@ The library uses MiniMagick to use ImageMagick and we use directly libav, ffmpeg
 To extract the images from the videos you can select your preferred capturer. Currently there are the following 3 options:
 
 * LibAV (implemented)
-* FFMPEG (missing)
+* FFMPEG (implemented)
 * MPlayer (missing)
 
 ### Using with Paperclip, Carrierwave, Refile

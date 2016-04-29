@@ -17,7 +17,7 @@ module VCSRuby
     end
 
     def available?
-      @mplayer.available?
+      @mplayer.available? && false
     end
   end
 end
