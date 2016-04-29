@@ -15,8 +15,12 @@ module VCSRuby
     end
 
     def find_path
-      font = `fc-list | grep #{name}`
-      font.split(':').first.strip
+      if Tools::windows?
+        font = `fc-list | grep #{name}`
+        font.split(':').first.strip
+      else
+        raise 'TODO'
+      end
     end
 
     def line_height
