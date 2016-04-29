@@ -15,16 +15,22 @@ module VCSRuby
       @available
     end
 
-    def execute parameter, streams = "2> /dev/null"
-      raise "Command '#{name}' not available" unless available
-
+    def execute parameter, streams = 0
+      raise "Command '#{name}' not available" unless available?
+      result = nil
       if Tools::windows?
-        `cmd /C #{@command} #{parameter}`
+        streams = '2> nul' if streams === 0
+        
+        result = `cmd /C #{@command} #{parameter} #{streams}`
       else
-        `#{@command} #{parameter} #{streams}`
+        streams = "2> /dev/null" if streams === 0
+        
+        result =`#{@command} #{parameter} #{streams}`
       end
-    end
 
+      raise "#{@command} failed with return value '#{$?}'"unless $? == 0
+      return result
+    end
 private
     # http://stackoverflow.com/questions/2108727/which-in-ruby-checking-if-program-exists-in-path-from-ruby
     def which cmd

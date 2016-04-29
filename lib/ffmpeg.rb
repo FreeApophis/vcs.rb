@@ -24,14 +24,15 @@ module VCSRuby
     end
 
     def available?
-      @ffmpeg.available?
+      @ffmpeg.available? && false
     end
 
     def detect_version
-      info = @ffmpeg.execute("-version")
-      raise "TODO"
+      info = @ffmpeg.execute('-version')
       match = /avconv ([\d|.|-|:]*)/.match(info)
-      @version = match[1]
+      if match
+        @version = match[1]
+      end
     end
 
     def length
@@ -78,7 +79,7 @@ module VCSRuby
     end
 
     def grab time, image_path
-      @ffmpeg.execute "-y -ss #{time.total_seconds} -i '#{@video}' -an -dframes 1 -vframes 1 -vcodec png -f rawvideo '#{image_path}'"
+      @ffmpeg.execute "-y -ss #{time.total_seconds} -i \"#{@video}\" -an -dframes 1 -vframes 1 -vcodec png -f rawvideo \"#{image_path}\""
     end
 
     def to_s
@@ -89,7 +90,7 @@ private
     def load_probe
       return if @cache
 
-      @cache = @ffmpeg.execute("'#{@video}'", "2>&1")
+      @cache = @ffmpeg.execute("\"#{@video}\"", "2>&1")
       puts @cache if Tools.verbose?
 
       parse_video_streams

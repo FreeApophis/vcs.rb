@@ -5,7 +5,11 @@
 module VCSRuby
   class Tools
     def self.windows?
-      false
+      return ((RUBY_PLATFORM =~ /win32/ or RUBY_PLATFORM =~ /mingw32/) or (RbConfig::CONFIG['host_os'] =~ /mswin|windows/i))
+    end
+
+    def self.linux?
+      return ((RUBY_PLATFORM =~ /linux/) or (RbConfig::CONFIG['host_os'] =~ /linux/i))
     end
 
     def self.verbose= verbose

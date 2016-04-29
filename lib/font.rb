@@ -16,10 +16,11 @@ module VCSRuby
 
     def find_path
       if Tools::windows?
+        Dir.entries File.join(ENV['windir'], 'fonts')
+        ''
+      else 
         font = `fc-list | grep #{name}`
         font.split(':').first.strip
-      else
-        raise 'TODO'
       end
     end
 

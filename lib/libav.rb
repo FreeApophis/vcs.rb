@@ -29,9 +29,9 @@ module VCSRuby
     end
 
     def detect_version
-      info = @avconv.execute("-version")
+      info = @avconv.execute('-version')
       match = /avconv ([\d|.|-|:]*)/.match(info)
-      @version = match[1]
+      @version = match[1] if match
     end
 
     def length
@@ -78,7 +78,7 @@ module VCSRuby
     end
 
     def grab time, image_path
-      @avconv.execute "-y -ss #{time.total_seconds} -i '#{@video}' -an -dframes 1 -vframes 1 -vcodec png -f rawvideo '#{image_path}'"
+      @avconv.execute "-y -ss #{time.total_seconds} -i \"#{@video}\" -an -dframes 1 -vframes 1 -vcodec png -f rawvideo \"#{image_path}\""
     end
 
     def to_s
@@ -89,7 +89,7 @@ private
     def load_probe
       return if @cache
 
-      @cache = @avprobe.execute("'#{@video}'", "2>&1")
+      @cache = @avprobe.execute("\"#{@video}\"", "2>&1")
       puts @cache if Tools.verbose?
 
       parse_video_streams
