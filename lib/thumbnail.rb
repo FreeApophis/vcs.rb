@@ -14,8 +14,7 @@ module VCSRuby
       @capper = capper
       @video = video
       @configuration = configuration
-
-      @filters = [method(:resize_filter), method(:timestamp_filter), method(:softshadow_filter)]
+      @filters = [ method(:resize_filter),  method(:timestamp_filter), method(:softshadow_filter) ]
     end
 
     def capture 
@@ -93,10 +92,29 @@ private
       convert.repage.+
     end
 
-    def polaroid_filter
+    def polaroid_filter convert
+      border = 8
+      convert.stack do |a|
+        a.fill 'White'
+        a.background 'White'
+        a.bordercolor 'White'
+        a.mattecolor 'White'
+        a.frame "#{border}x#{border}"
+        a.stack do |b|
+          b.flip
+          b.splice "0x#{border*5}"
+        end
+        a.flip
+        a.bordercolor 'Grey60'
+        a.border 1
+        a.repage.+
+      end
     end
 
-    def random_rotation_filter
+    def random_rotation_filter convert
+      angle = Random::rand(-18..18)
+      convert.background 'None'
+      convert.rotate angle
     end
 
     def film_filter
