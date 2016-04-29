@@ -2,6 +2,9 @@
 
 Video Contact Sheet for Ruby
 
+[![Gem Version](https://badge.fury.io/rb/vcs_ruby.png)](https://badge.fury.io/rb/vcs_ruby)
+[![Build Status](https://travis-ci.org/FreeApophis/vcs.rb.svg?branch=master)](https://travis-ci.org/FreeApophis/vcs.rb)
+
 I do like the results of the "[Video Contact Sheet *NIX](http://p.outlyer.net/vcs/)" but the Script is written as a Shell Script and naturally this makes it hard to understand and extend.
 
 vcs.rb has two main-scenarios in mind.
