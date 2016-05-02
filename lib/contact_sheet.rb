@@ -235,7 +235,9 @@ private
         convert.stack do |ul|
           ul.size "#{montage.width}x#{@configuration.title_font.line_height}"
           ul.xc @configuration.title_background
-          ul.font @configuration.title_font.path
+          if @configuration.title_font.exists?
+            ul.font @configuration.title_font.path
+          end
           ul.pointsize @configuration.title_font.size
           ul.background @configuration.title_background
           ul.fill @configuration.title_color
@@ -288,7 +290,9 @@ private
           a.size "#{montage.width - 18}x1"
           a.xc @configuration.header_background
           a.size.+
-          a.font @configuration.header_font.path
+          if @configuration.header_font.exists?
+            a.font @configuration.header_font.path
+          end
           a.pointsize @configuration.header_font.size
           a.background @configuration.header_background
           a.fill 'Black'
@@ -296,11 +300,15 @@ private
             b.gravity 'West'
             b.stack do |c|
               c.label 'Filename: '
-              c.font  @configuration.header_font.path
+              if @configuration.header_font.exists?
+                c.font  @configuration.header_font.path
+              end
               c.label File.basename(@video)
               c.append.+
             end
-            b.font @configuration.header_font.path
+            if @configuration.header_font.exists?            
+              b.font @configuration.header_font.path
+            end
             b.label "File size: #{Tools.to_human_size(File.size(@video))}"
             b.label "Length: #{@length.to_timestamp}"
             b.append
@@ -326,7 +334,9 @@ private
             a.size "#{montage.width}x#{signature_height}"
             a.gravity 'Center'
             a.xc @configuration.signature_background
-            a.font @configuration.signature_font.path
+            if @configuration.signature_font.exists?
+              a.font @configuration.signature_font.path
+            end
             a.pointsize @configuration.signature_font.size
             a.fill @configuration.signature_color
             a.annotate(0, @signature)

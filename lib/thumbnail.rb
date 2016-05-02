@@ -65,7 +65,9 @@ private
         box.fill  @configuration.timestamp_color
         box.pointsize @configuration.timestamp_font.size
         box.gravity 'SouthEast'
-        box.font @configuration.timestamp_font.path
+        if @configuration.timestamp_font.exists?
+          box.font @configuration.timestamp_font.path 
+        end
         box.annotate('+10+10', " #{@time.to_timestamp} ")
       end
       convert.flatten
