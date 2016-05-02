@@ -139,5 +139,6 @@ begin
   end
 rescue Exception => e
   STDERR.puts "ERROR: #{e.message}"
+  STDERR.puts "#{e.backtrace.join("\n")}" if options[:verbose]
 end
 

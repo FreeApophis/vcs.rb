@@ -9,27 +9,27 @@ module VCSRuby
     end
 
     def name
-      raise "NotImplmentedException"
+      raise "NotImplementedException"
     end
 
     def load_video
-      raise "NotImplmentedException"
+      raise "NotImplementedException"
     end
 
     def length
-      raise "NotImplmentedException"
+      raise "NotImplementedException"
     end
 
     def width
-      raise "NotImplmentedException"
+      raise "NotImplementedException"
     end
 
     def height
-      raise "NotImplmentedException"
+      raise "NotImplementedException"
     end
 
-    def grab time
-      raise "NotImplmentedException"
+    def grab time, image_path
+      raise "NotImplementedException"
     end
   end
 end
