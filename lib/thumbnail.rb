@@ -17,7 +17,7 @@ module VCSRuby
       @filters = [ method(:resize_filter),  method(:timestamp_filter), method(:softshadow_filter) ]
     end
 
-    def capture 
+    def capture
       @capper.grab @time, @image_path
     end
 

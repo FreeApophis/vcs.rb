@@ -19,11 +19,11 @@ module VCSRuby
     def length
       raise "NotImplmentedException"
     end
-  
+
     def width
       raise "NotImplmentedException"
     end
-  
+
     def height
       raise "NotImplmentedException"
     end

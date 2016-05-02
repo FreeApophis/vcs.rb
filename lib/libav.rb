@@ -100,7 +100,7 @@ private
       video_stream = split_stream_line(is_stream?(@cache, /Video/).first)
 
       dimensions = /(\d*)x(\d*) \[PAR (\d*:\d*) DAR (\d*:\d*)\]/.match(video_stream[DIMENSION])
-    
+
       if dimensions
         @par = dimensions[3]
         @dar = dimensions[4]

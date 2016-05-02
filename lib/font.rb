@@ -18,7 +18,7 @@ module VCSRuby
       if Tools::windows?
         Dir.entries File.join(ENV['windir'], 'fonts')
         ''
-      else 
+      else
         font = `fc-list | grep #{name}`
         font.split(':').first.strip
       end

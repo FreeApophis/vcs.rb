@@ -9,11 +9,11 @@ require 'yaml'
 require 'vcs'
 
 module VCSRuby
-  class ContactSheet 
+  class ContactSheet
     attr_accessor :capturer, :format, :signature, :title, :highlight
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
-      
+
     def initialize video, capturer = :any
       @capturer = capturer
       @configuration = Configuration.new
@@ -22,7 +22,7 @@ module VCSRuby
       initialize_filename(File.basename(@video, '.*'))
       puts "Processing #{File.basename(video)}..." unless Tools.quiet?
       detect_video_properties
-      
+
       @thumbnails = []
 
       @tempdir = Dir.mktmpdir
@@ -56,7 +56,7 @@ module VCSRuby
       @interval = interval
     end
 
-    def rows 
+    def rows
       @rows
     end
 
@@ -105,7 +105,7 @@ module VCSRuby
         raise "Invalid To Time"
       end
     end
- 
+
 
     def self.finalize(tempdir)
       proc do
@@ -117,7 +117,7 @@ module VCSRuby
     def build
       initialize_thumbnails
       capture_thumbnails
-      
+
       puts "Composing standard contact sheet..." unless Tools.quiet?
       s = splice_montage(montage_thumbs)
 
@@ -209,7 +209,7 @@ private
         end
         montage.geometry "+#{@configuration.padding}+#{@configuration.padding}"
         # rows or columns can be nil (auto fit)
-        montage.tile "#{@columns}x#{@rows}" 
+        montage.tile "#{@columns}x#{@rows}"
         montage << file_path
       end
       return file_path
@@ -220,9 +220,9 @@ private
       MiniMagick::Tool::Convert.new do |convert|
         convert << montage_path
         convert.background @configuration.contact_background
-        convert.splice '5x10'      
+        convert.splice '5x10'
         convert << file_path
-      end    
+      end
       file_path
      end
 

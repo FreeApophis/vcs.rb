@@ -11,7 +11,7 @@ module VCSRuby
       if time_index.instance_of? Float or time_index.instance_of? Fixnum
         @total_seconds = time_index
       else
-        @total_seconds = 0.0 
+        @total_seconds = 0.0
         @to_parse = time_index.strip
 
         unless @to_parse.empty?

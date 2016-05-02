@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Video Contact Sheet Ruby: 
+# Video Contact Sheet Ruby:
 # ----------------------
 #
 # Generates contact sheets of videos
@@ -19,10 +19,10 @@ include VCSRuby
 
 
 # Configuration can Override options
-options = 
-{ 
-             quiet: false, 
-           verbose: false, 
+options =
+{
+             quiet: false,
+           verbose: false,
           capturer: :any,
             format: nil,
             output: []
@@ -35,10 +35,10 @@ arguments =
     '--capturer' => [:ffmpeg, :libav, :mplayer, :any],
     '--format' => [:png, :jpg, :jpeg, :tiff],
     '--funky' =>  [:polaroid, :photos, :overlap, :rotate, :photoframe, :polaroidframe, :film, :random]
-}  
+}
 
 # Command Line Parameters
-optparse = OptionParser.new do|opts| 
+optparse = OptionParser.new do|opts|
   opts.separator $vcs_ruby_name + ' ' + $vcs_ruby_version.to_s
   opts.separator ''
   opts.on( '-i [INTERVAL]', '--interval [INTERVAL]', 'Set the interval [INTERVAL]') do |interval|
@@ -83,7 +83,7 @@ optparse = OptionParser.new do|opts|
   opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Change the image signature to your preference.') do |signature|
     options[:signature] = signature
   end
-  opts.on( '--no-signature', 'Remove footer with signature') do 
+  opts.on( '--no-signature', 'Remove footer with signature') do
     options[:no_signature] = true
   end
   opts.on( '-l [HIGHLIGHT]', '--highlight [HIGHLIGHT]' 'Add the frame found at timestamp [HIGHLIGHT] as a highlight.') do |highlight|
@@ -95,14 +95,14 @@ optparse = OptionParser.new do|opts|
   opts.on("-V", "--verbose", "More verbose Output.") do
     options[:verbose] = true
   end
-  opts.on( '-v', '--version', 'Version' ) do 
+  opts.on( '-v', '--version', 'Version' ) do
     puts $vcs_ruby_name + ' ' + $vcs_ruby_version.to_s
-    exit 0 
-  end 
-  
-  opts.on( '-h', '--help', 'Prints help' ) do 
+    exit 0
+  end
+
+  opts.on( '-h', '--help', 'Prints help' ) do
     options[:help] = true
-  end 
+  end
 
   opts.separator ''
   opts.separator 'Examples:'
@@ -121,7 +121,7 @@ optparse = OptionParser.new do|opts|
 end
 
 Tools::print_help optparse if ARGV.empty?
-  
+
 optparse.parse!
 
 Tools::print_help optparse if options[:help] || ARGV.empty?

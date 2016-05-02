@@ -20,11 +20,11 @@ module VCSRuby
       result = nil
       if Tools::windows?
         streams = '2> nul' if streams === 0
-        
+
         result = `cmd /C #{@command} #{parameter} #{streams}`
       else
         streams = "2> /dev/null" if streams === 0
-        
+
         result =`#{@command} #{parameter} #{streams}`
       end
 
