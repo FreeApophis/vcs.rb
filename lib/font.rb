@@ -58,12 +58,12 @@ module VCSRuby
       fonts.lines.each do |line|
         key, value = line.strip.split(':', 2).map(&:strip)
         
-        next if ['Path'].include? key
+        next if [nil, 'Path'].include? key
 
         if key == 'Font'
           @@fonts[value] = font = IMFont.new(value) 
         else           
-          font.send(key + '=', value)
+          font.send("#{key}=", value)
         end
       end
     end
