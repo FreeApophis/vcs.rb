@@ -17,7 +17,8 @@ module VCSRuby
       @video = video
       @avconv = Command.new :libav, 'avconv'
       @avprobe = Command.new :libav, 'avprobe'
-      detect_version
+      
+      detect_version if available?
     end
 
     def name

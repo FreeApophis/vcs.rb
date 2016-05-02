@@ -137,7 +137,7 @@ begin
     sheet.initialize_filename(options[:output][index]) if options[:output][index]
     sheet.build
   end
-#rescue Exception => e
-#  STDERR.puts "ERROR: #{e.message}"
+rescue Exception => e
+  STDERR.puts "ERROR: #{e.message}"
 end
 

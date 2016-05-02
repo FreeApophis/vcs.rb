@@ -135,24 +135,27 @@ private
     def selected_capturer
       result = nil
       if @capturer == nil || @capturer == :any
-        result = @capturers.first
+        result = available_capturers.first
       else
-        result =  @capturers.select{ |c| c.name == @capturer }.first
+        result =  available_capturers.select{ |c| c.name == @capturer }.first
       end
-      raise "Selected Capturer (#{@capturer.to_s}) not available" unless result
+      raise "Selected Capturer (#{@capturer.to_s}) not available. Install one of these: #{@capturers.map{ |c| c.name }.join(', ')}" unless result
       return result
     end
 
     def initialize_capturers video
-      capturers = []
-      capturers << LibAV.new(video)
-      capturers << MPlayer.new(video)
-      capturers << FFmpeg.new(video)
+      @capturers = []
+      @capturers << LibAV.new(video)
+      @capturers << MPlayer.new(video)
+      @capturers << FFmpeg.new(video)
 
       @video = video
-      @capturers = capturers.select{ |c| c.available? }
 
-      puts "Available capturers: #{@capturers.map{ |c| c.to_s }.join(', ')}" if Tools.verbose?
+      puts "Available capturers: #{available_capturers.map{ |c| c.to_s }.join(', ')}" if Tools.verbose?
+    end
+    
+    def available_capturers 
+      @capturers.select{ |c| c.available? }
     end
 
     def initialize_thumbnails

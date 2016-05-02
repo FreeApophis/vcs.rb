@@ -17,7 +17,8 @@ module VCSRuby
       @video = video
       @ffmpeg = Command.new :ffmpeg, 'ffmpeg'
       @ffprobe = Command.new :ffmpeg, 'ffprobe'
-      detect_version
+      
+      detect_version if available?
     end
 
     def name

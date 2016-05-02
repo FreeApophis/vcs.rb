@@ -19,5 +19,10 @@ module VCSRuby
     def available?
       @mplayer.available? && false
     end
+    
+    def to_s
+      "MPlayer #{@version}"
+    end
+
   end
 end
