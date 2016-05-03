@@ -15,9 +15,9 @@ module VCSRuby
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
 
-    def initialize video, capturer = :any
-      @capturer = capturer
-      @configuration = Configuration.new
+    def initialize video, profile = nil
+      @capturer = :any
+      @configuration = Configuration.new profile
       @signature = "Created by Video Contact Sheet Ruby"
       initialize_capturers video
       initialize_filename(File.basename(@video, '.*'))
@@ -121,7 +121,6 @@ module VCSRuby
     end
 
     def build
-puts selected_capturer.available_formats.inspect
       selected_capturer.format = selected_capturer.available_formats.first
       initialize_filters
       initialize_thumbnails
@@ -325,7 +324,7 @@ private
           end
           a.pointsize @configuration.header_font.size
           a.background @configuration.header_background
-          a.fill 'Black'
+          a.fill @configuration.header_color
           a.stack do |b|
             b.gravity 'West'
             b.stack do |c|

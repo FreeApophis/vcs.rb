@@ -4,28 +4,52 @@
 
 require 'font'
 
+
+class ::Hash
+    def deep_merge(second)
+        merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+        self.merge(second, &merger)
+    end
+end
+
 module VCSRuby
   class Configuration
     attr_accessor :capturer
     attr_reader :header_font, :title_font, :timestamp_font, :signature_font
 
-    def initialize
+    def initialize profile
       default_config_file = File.expand_path("defaults.yml", File.dirname(__FILE__))
-      local_config_files = ['~/.vcs.rb.yml']
+      @config = ::YAML::load_file(default_config_file)
 
-      config = ::YAML::load_file(default_config_file)
+      local_config_files = ['~/.vcs.rb.yml']
       local_config_files.select{ |f| File.exists?(f) }.each do |local_config_file|
         puts "Local configuration file loaded: #{local_config_file}" if Tools.verbose?
         local_config = YAML::load_file(local_config_file)
-        cconfig.merge(local_config)
+        @config = @config.deep_merge(local_config)
       end
 
-      @config = config
-
+      load_profile profile if profile
+      
       @header_font    = Font.new @config['style']['header']['font'],    @config['style']['header']['size']
       @title_font     = Font.new @config['style']['title']['font'],     @config['style']['title']['size']
       @timestamp_font = Font.new @config['style']['timestamp']['font'], @config['style']['timestamp']['size']
       @signature_font = Font.new @config['style']['signature']['font'], @config['style']['signature']['size']
+    end
+
+    def load_profile profile
+      profiles = [File.expand_path("#{profile}.yml", File.dirname(__FILE__)), "~/#{profile}.yml"]
+
+      found = false
+      profiles.each do |profile|
+        if File.exists?(profile)
+          puts "Profile loaded: #{profile}" if Tools.verbose?
+          config = YAML::load_file(profile)
+          @config = @config.deep_merge(config)
+          found = true
+        end
+      end
+
+      raise "No profile '#{profile}' found" unless found
     end
 
     def rows

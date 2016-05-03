@@ -40,7 +40,9 @@ module VCSRuby
     end
 
     def self.contact_sheet_with_options video, options
-      sheet = VCSRuby::ContactSheet.new video, options[:capturer]
+      sheet = VCSRuby::ContactSheet.new video, options[:profile]
+
+      sheet.capturer = options[:capturer]
       sheet.format = options[:format] if options[:format]
       sheet.title = options[:title] if options[:title]
       sheet.signature = options[:signature] if options[:signature]

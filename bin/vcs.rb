@@ -98,9 +98,9 @@ optparse = OptionParser.new do|opts|
   opts.on("--[no-]polaroid", "Thumbnails look as polaroid frames. Default: false") do |polaroid|
     options[:polaroid] = polaroid
   end
-
-
-
+  opts.on( '-p [PROFILE]', '--profile [PROFILE]' 'Loads additional setting from profile.yml.') do |profile|
+    options[:profile] = profile
+  end
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
     options[:quiet] = true
   end
