@@ -11,6 +11,7 @@ require 'vcs'
 module VCSRuby
   class ContactSheet
     attr_accessor :capturer, :format, :signature, :title, :highlight
+    attr_accessor :softshadow, :timestamp, :polaroid
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
 
@@ -24,6 +25,11 @@ module VCSRuby
       detect_video_properties
 
       @thumbnails = []
+      @filters = []
+
+      @timestamp = true
+      @softshadow = true
+      @polaroid = false
 
       @tempdir = Dir.mktmpdir
 
@@ -115,13 +121,14 @@ module VCSRuby
     end
 
     def build
+      initialize_filters
       initialize_thumbnails
       capture_thumbnails
 
       puts "Composing standard contact sheet..." unless Tools.quiet?
-      s = splice_montage(montage_thumbs)
+      montage = splice_montage(montage_thumbs)
 
-      image = MiniMagick::Image.open(s)
+      image = MiniMagick::Image.open(montage)
 
       puts "Adding header and footer..." unless Tools.quiet?
       final = add_header_and_footer image
@@ -158,6 +165,13 @@ private
       @capturers.select{ |c| c.available? }
     end
 
+    def initialize_filters
+      @filters << :resize_filter
+      @filters << :softshadow_filter if softshadow
+      @filters << :timestamp_filter if timestamp
+      @filters << :polaroid_filter if polaroid
+    end
+
     def initialize_thumbnails
       time = @from
       (1..number_of_caps).each do |i|
@@ -167,6 +181,7 @@ private
         thumb.height = thumbnail_height
         thumb.time = (time += interval)
         thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.png")
+        thumb.filters.push(*@filters)
 
         @thumbnails << thumb
       end
@@ -219,11 +234,24 @@ private
     end
 
     def splice_montage montage_path
+      if softshadow
+        left = @configuration.padding + 3
+        top = @configuration.padding + 5
+        bottom = right = @configuration.padding
+      else
+        left = right = top = bottom = @configuration.padding
+      end 
+
+
       file_path = File::join(@tempdir, 'spliced.png')
       MiniMagick::Tool::Convert.new do |convert|
         convert << montage_path
         convert.background @configuration.contact_background
-        convert.splice '5x10'
+
+        convert.splice "#{left}x#{top}"
+        convert.gravity 'SouthEast'
+        convert.splice "#{right}x#{bottom}"
+
         convert << file_path
       end
       file_path

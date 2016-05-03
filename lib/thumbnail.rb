@@ -9,12 +9,13 @@ module VCSRuby
     attr_accessor :width, :height, :aspect
     attr_accessor :image_path
     attr_accessor :time
+    attr_reader :filters
 
     def initialize capper, video, configuration
       @capper = capper
       @video = video
       @configuration = configuration
-      @filters = [ method(:resize_filter),  method(:timestamp_filter), method(:softshadow_filter) ]
+      @filters = []
     end
 
     def capture
@@ -47,14 +48,28 @@ module VCSRuby
         convert.background 'Transparent'
         convert.fill 'Transparent'
         convert << @image_path
-        @filters.each do |filter|
-          filter.call(convert)
+
+        sorted_filters.each do |filter|
+          call_filter filter, convert
         end
+
         convert << @image_path
       end
     end
 
 private
+    def call_filter filter, convert
+      if respond_to?(filter, true)
+        method(filter).call(convert)
+      else
+        raise "Filter '#{filter}' does not exist"
+      end
+    end
+
+    def sorted_filters
+      [:resize_filter, :timestamp_filter, :photoframe_filter, :polaroid_filter, :random_rotation_filter, :softshadow_filter].select{ |filter| @filters.include?(filter) }
+    end
+
     def resize_filter convert
       convert.resize "#{width}x#{height}!"
     end
@@ -74,13 +89,6 @@ private
       convert.gravity 'None'
     end
 
-    def photoframe_filter convert
-      convert.bordercolor 'White'
-      convert.border 3
-      convert.bordercolor 'Grey60'
-      convert.border 1
-    end
-
     def softshadow_filter convert
       convert.stack do |box|
         box.background 'Black'
@@ -92,6 +100,13 @@ private
       convert.flatten
       convert.trim
       convert.repage.+
+    end
+
+    def photoframe_filter convert
+      convert.bordercolor 'White'
+      convert.border 3
+      convert.bordercolor 'Grey60'
+      convert.border 1
     end
 
     def polaroid_filter convert
@@ -109,8 +124,8 @@ private
         a.flip
         a.bordercolor 'Grey60'
         a.border 1
-        a.repage.+
       end
+      convert.repage.+
     end
 
     def random_rotation_filter convert

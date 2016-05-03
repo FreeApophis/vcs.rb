@@ -89,6 +89,18 @@ optparse = OptionParser.new do|opts|
   opts.on( '-l [HIGHLIGHT]', '--highlight [HIGHLIGHT]' 'Add the frame found at timestamp [HIGHLIGHT] as a highlight.') do |highlight|
     options[:highlight] = TimeIndex.new highlight
   end
+  opts.on("--[no-]timestamp", "Add timestamp to thumbnails. Default: true") do |timestamp|
+    options[:timestamp] = timestamp
+  end
+  opts.on("--[no-]shadow", "Add shadow to thumbnails. Default: true") do |shadow|
+    options[:shadow] = shadow
+  end
+  opts.on("--[no-]polaroid", "Thumbnails look as polaroid frames. Default: false") do |polaroid|
+    options[:polaroid] = polaroid
+  end
+
+
+
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
     options[:quiet] = true
   end
