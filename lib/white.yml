@@ -1,0 +1,12 @@
+style:
+  header:
+    color: Black
+    background: White
+  title:
+    color: Black
+    background: White
+  contact:
+    background: White
+  signature:
+    color: Black
+    background: White

@@ -1,0 +1,12 @@
+style:
+  header:
+    color: Black
+    background: YellowGreen
+  title:
+    color: White
+    background: Black
+  contact:
+    background: White
+  signature:
+    color: Black
+    background: SandyBrown
