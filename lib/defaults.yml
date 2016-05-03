@@ -4,6 +4,10 @@ main:
   interval: ~
   padding: 2
   quality: 95
+filter:
+  timestamp: true
+  polaroid: false
+  softshadow: true
 style:
   header:
     font: DejaVuSans.ttf

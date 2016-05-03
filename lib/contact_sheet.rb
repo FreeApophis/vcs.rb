@@ -27,9 +27,9 @@ module VCSRuby
       @thumbnails = []
       @filters = []
 
-      @timestamp = true
-      @softshadow = true
-      @polaroid = false
+      @timestamp = @configuration.timestamp
+      @softshadow = @configuration.softshadow
+      @polaroid = @configuration.polaroid
 
       @tempdir = Dir.mktmpdir
 

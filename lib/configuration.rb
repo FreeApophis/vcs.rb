@@ -123,5 +123,17 @@ module VCSRuby
     def blank_alternatives
       @config['lowlevel']['blank_alternatives'].map{ |e| TimeIndex.new e.to_i }
     end
+
+    def timestamp
+      !!@config['filter']['timestamp']
+    end
+
+    def polaroid
+      !!@config['filter']['polaroid']
+    end
+
+    def softshadow
+      !!@config['filter']['softshadow']
+    end
   end
  end
