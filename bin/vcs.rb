@@ -79,14 +79,14 @@ optparse = OptionParser.new do|opts|
   end
   opts.on( '-o [FILE]', '--output [FILE]', 'File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.') do |file|
     options[:output] << file
-  end
+  end	
   opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Change the image signature to your preference.') do |signature|
     options[:signature] = signature
   end
   opts.on( '--no-signature', 'Remove footer with signature') do
     options[:no_signature] = true
   end
-  opts.on( '-l [HIGHLIGHT]', '--highlight [HIGHLIGHT]' 'Add the frame found at timestamp [HIGHLIGHT] as a highlight.') do |highlight|
+  opts.on( '-l [HIGHLIGHT]', '--highlight [HIGHLIGHT]', 'Add the frame found at timestamp [HIGHLIGHT] as a highlight.') do |highlight|
     options[:highlight] = TimeIndex.new highlight
   end
   opts.on("--[no-]timestamp", "Add timestamp to thumbnails. Default: true") do |timestamp|
@@ -95,19 +95,19 @@ optparse = OptionParser.new do|opts|
   opts.on("--[no-]shadow", "Add shadow to thumbnails. Default: true") do |shadow|
     options[:shadow] = shadow
   end
-  opts.on("--[no-]polaroid", "Thumbnails look as polaroid frames. Default: false") do |polaroid|
+  opts.on("--[no-]polaroid", "Add  polaroid frame to thumbnail. Default: false") do |polaroid|
     options[:polaroid] = polaroid
   end
-  opts.on( '-p [PROFILE]', '--profile [PROFILE]' 'Loads additional setting from profile.yml.') do |profile|
+  opts.on( '-p [PROFILE]', '--profile [PROFILE]', 'Loads additional setting from profile.yml.') do |profile|
     options[:profile] = profile
   end
-  opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors. Repeat to mute completely, even on error.') do |file|
+  opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors.') do |file|
     options[:quiet] = true
   end
   opts.on("-V", "--verbose", "More verbose Output.") do
     options[:verbose] = true
   end
-  opts.on( '-v', '--version', 'Version' ) do
+  opts.on( '-v', '--version', 'Current Version' ) do
     puts $vcs_ruby_name + ' ' + $vcs_ruby_version.to_s
     exit 0
   end

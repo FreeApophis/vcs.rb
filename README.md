@@ -48,9 +48,9 @@ The library uses MiniMagick to use ImageMagick and we use directly libav, ffmpeg
 
 To extract the images from the videos you can select your preferred capturer. Currently there are the following 3 options:
 
-* LibAV (implemented)
-* FFMPEG (implemented)
-* MPlayer (missing)
+* LibAV
+* FFMPEG
+* MPlayer
 
 ### Using with Paperclip, Carrierwave, Refile
 
@@ -60,7 +60,7 @@ Not yet tried. Any feedback welcome.
 
 ### Command Line Options
 
-    Video Contact Sheet Ruby 0.8.0
+    Video Contact Sheet Ruby 1.0.0
 
         -i, --interval [INTERVAL]        Set the interval [INTERVAL]
         -c, --columns [COLUMNS]          Arrange the output in <COLUMNS> columns.
@@ -76,17 +76,77 @@ Not yet tried. Any feedback welcome.
         -o, --output [FILE]              File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.
         -s, --signature [SIGNATURE]      Change the image signature to your preference.
             --no-signature               Remove footer with signature
-        -l [HIGHLIGHT]Add the frame found at timestamp [HIGHLIGHT] as a highlight.,
-            --highlight
-        -q, --quiet                      Don't print progress messages just errors. Repeat to mute completely, even on error.
+        -l, --highlight [HIGHLIGHT]      Add the frame found at timestamp [HIGHLIGHT] as a highlight.
+            --[no-]timestamp             Add timestamp to thumbnails. Default: true
+            --[no-]shadow                Add shadow to thumbnails. Default: true
+            --[no-]polaroid              Add  polaroid frame to thumbnail. Default: false
+        -p, --profile [PROFILE]          Loads additional setting from profile.yml.
+        -q, --quiet                      Don't print progress messages just errors.
         -V, --verbose                    More verbose Output.
-        -v, --version                    Version
+        -v, --version                    Current Version
         -h, --help                       Prints help
 
     Examples:
-        Create a contact sheet with default values (4 x 4 matrix):
-        $ vcs video.avi
+      Create a contact sheet with default values (4 x 4 matrix):
+      $ vcs video.avi
 
-        Create a sheet with vidcaps at intervals of 3 and a half minutes, save to
-        "output.jpg":
-        $ vcs -i 3m30 input.wmv -o output.jpg
+      Create a sheet with vidcaps at intervals of 3 and a half minutes, save to
+      "output.jpg":
+      $ vcs -i 3m30 input.wmv -o output.jpg
+
+      Create a sheet with vidcaps starting at 3 mins and ending at 18 mins in 2m intervals
+      $ vcs --from 3m --to 18m -i 2m input.avi
+
+### Profiles
+
+Each Profile is a yml file which copies all or parts of the defaults.yml file to overwrite some part of the settings.
+
+There are a few profiles delivered with the gem. [black, white, oldstyle]
+
+    twobytwo.yml
+
+This Profile Makes a two by two contact sheet with a large 10px padding and red text on yellow background for the header part. Place this file directly into the <home> dir and call it with --profile twobytwo
+
+    main:
+      rows: 2
+      columns: 2
+      interval: ~
+      padding: 10
+    style:
+      header:
+        color: Red
+        background: "#ffcc00"
+
+### All Profile Settings
+
+Options | Default | Description
+------- | ------- | -----------
+main:rows: | 4 | Number of Rows
+main:columns: | 4 | Number of Columns
+main:interval: | ~ | Number of columns, default is ~ (nil)
+main:padding: | 2 | Padding in pixels | around thumbnail
+main:quality | 95 | quality level [1-100] for jpeg images
+filter:timestamp | true | Add a timestamp to the thumbnail
+filter:polaroid | true | Add a polaroid frame to the thumbnail
+filter:softshadow | true | Add a shadow to the thumbanil
+style:header:font | DejaVuSans.ttf | font (name or file) for the header 
+style:header:size | 14 | Size of the font for the header
+style:header:color | Black | Color of the text for the header
+style:header:background | #afcd7a | Background color for the header
+style:title:font | DejaVuSans.ttf | font (name or file) for the title 
+style:title:size | 33 | Size of the font for the title
+style:title:color | Black | Color of the text for the title
+style:title:background | White | Background color for the title
+style:highlight:background | SlateGray | Background color for the highlight 
+style:contact:background | SlateGray | Background color for the contact sheet
+style:timestamp:font | DejaVuSans.ttf | font (name or file) for the timestamp 
+style:timestamp:size | 14 | Size of  the font for the timestamp
+style:timestamp:color | White | Color of the text for the timestamp
+style:timestamp:background | #000000aa |  Background color for the timestamp
+style:signature:font | DejaVuSans.ttf | font (name or file) for the signature
+style:signature:size | 10 | Size of the font for the signature
+style:signature:color | Black | Color of the text for the signature
+style:signature:background | SlateGray | Background color for the signature
+lowlevel:blank_evasion | true | try to avoid blank frames
+lowlevel:blank_threshold | 0.10 | median image brightness
+lowlevel:blank_alternatives | [ -5, 5, -10, 10, -30, 30] | Array of seconds around interval
