@@ -8,6 +8,9 @@ require 'fileutils'
 
 module VCSRuby
   class MPlayer < Capturer
+
+    HEADER = 2
+
     def initialize video
       @video = video
       @mplayer = Command.new :mplayer, 'mplayer'
@@ -60,13 +63,35 @@ module VCSRuby
     end
 
     def file_pattern n
-      "#{"%08d" % n}.png"
+      if format == :jpeg
+        "#{"%08d" % n}.jpg"
+      else
+        "#{"%08d" % n}.#{format.to_s}"
+      end
     end
 
     def grab time, image_path
-      @mplayer.execute "-sws 9 -ao null -benchmark -vo \"png:z=0\" -quiet -frames 5 -ss #{time.total_seconds} \"#{@video}\""
+      @mplayer.execute "-sws 9 -ao null -benchmark -vo #{@format} -quiet -frames 5 -ss #{time.total_seconds} \"#{@video}\""
       (1..4).each { |n| FileUtils.rm(file_pattern(n)) }
       FileUtils.mv(file_pattern(5), image_path)      
+    end
+
+    def available_formats
+      # Ordered by priority
+      image_formats = ['png', 'jpeg']
+      formats = []
+
+      list = @mplayer.execute("-vo help", 0, true)
+      list.lines.drop(HEADER).each do |codec|
+        name = format_split(codec)
+        formats << name if image_formats.include?(name)
+      end
+
+      image_formats.select{ |format| formats.include?(format) }.map(&:to_sym)
+    end
+
+    def format_split line
+      name = line.strip.split(' ', 2).first
     end
 
     def to_s

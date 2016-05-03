@@ -121,6 +121,8 @@ module VCSRuby
     end
 
     def build
+puts selected_capturer.available_formats.inspect
+      selected_capturer.format = selected_capturer.available_formats.first
       initialize_filters
       initialize_thumbnails
       capture_thumbnails
@@ -180,7 +182,7 @@ private
         thumb.width = thumbnail_width
         thumb.height = thumbnail_height
         thumb.time = (time += interval)
-        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.png")
+        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.#{selected_capturer.format.to_s}")
         thumb.filters.push(*@filters)
 
         @thumbnails << thumb

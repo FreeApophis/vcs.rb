@@ -31,5 +31,21 @@ module VCSRuby
     def grab time, image_path
       raise "NotImplementedException"
     end
+
+    def available_formats
+      raise "NotImplementedException"
+    end
+
+    def format
+      @format
+    end
+
+    def format= format
+      if available_formats.include? format
+        @format = format
+      else
+        raise "Capturer '#{name}' does not support format: '#{format}'"
+      end
+    end
   end
 end

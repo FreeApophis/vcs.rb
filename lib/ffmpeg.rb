@@ -13,6 +13,12 @@ module VCSRuby
     DIMENSION = 5
     FPS = 7
 
+    HEADER = 10
+
+    ENCODING_SUPPORT = 2
+    VIDEO_CODEC = 3
+    NAME = 8
+
     def initialize video
       @video = video
       @ffmpeg = Command.new :ffmpeg, 'ffmpeg'
@@ -88,6 +94,30 @@ module VCSRuby
 
     def grab time, image_path
       @ffmpeg.execute "-y -ss #{time.total_seconds} -i \"#{@video}\" -an -dframes 1 -vframes 1 -vcodec png -f rawvideo \"#{image_path}\""
+    end
+
+    def available_formats
+      # Ordered by priority
+      image_formats = ['png', 'tiff', 'bmp', 'mjpeg']
+      formats = []
+
+      list = @ffprobe.execute "-codecs"
+      list.lines.drop(HEADER).each do |codec|
+        name, e, v = format_split(codec)
+        formats << name if image_formats.include?(name) && e && v
+      end
+
+      image_formats.select{ |format| formats.include?(format) }.map(&:to_sym)
+    end
+
+    def format_split line
+      e = line[ENCODING_SUPPORT] == 'E'
+      v = line[VIDEO_CODEC] == 'V'
+
+      name = line[NAME..-1].split(' ', 2).first
+      return name, e, v
+    rescue
+      return nil, false, false
     end
 
     def to_s
