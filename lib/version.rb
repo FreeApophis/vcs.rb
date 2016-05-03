@@ -16,7 +16,7 @@ module VCSRuby
     parts[2] = (parts[2].to_i + 1).to_s
     File.open(version_path, 'w') {|f| f.write(parts.join('.')) }
 
-    $vcs_ruby_version
+    read_version
   end
 end
 
