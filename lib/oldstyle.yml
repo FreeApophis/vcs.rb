@@ -1,12 +1,22 @@
 style:
   header:
-    color: Black
-    background: YellowGreen
+    font: Nimbus-Mono-L-Bold
+    size: 18
+    color: Green
+    background: Black
   title:
+    font: Nimbus-Mono-L-Bold
+    size: 40
+    color: Green
+    background: Black
     color: White
     background: Black
   contact:
-    background: White
+    background: Black
   signature:
-    color: Black
-    background: SandyBrown
+    font: Nimbus-Mono-L-Bold
+    size: 18
+    color: Green
+    background: Black
+filter:
+  softshadow: false
