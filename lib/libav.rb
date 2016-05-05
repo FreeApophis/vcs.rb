@@ -170,6 +170,7 @@ private
     end
 
     def split_stream_line line
+      return [nil, nil, 'none'] unless line
       parts = line.split(',')
       stream = parts.shift
       result = stream.split(':')
