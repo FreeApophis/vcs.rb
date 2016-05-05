@@ -104,6 +104,9 @@ optparse = OptionParser.new do|opts|
   opts.on( '-q', '--quiet', 'Don\'t print progress messages just errors.') do |file|
     options[:quiet] = true
   end
+  opts.on('--continue', 'Prints Error message and continues with next file (if any left)') do |file|
+    options[:continue] = true
+  end
   opts.on("-V", "--verbose", "More verbose Output.") do
     options[:verbose] = true
   end
@@ -143,14 +146,24 @@ Tools::quiet = options[:quiet]
 
 # Invoke ContactSheet
 
-begin
-  ARGV.each_with_index do |video, index|
+errors = {}
+ARGV.each_with_index do |video, index|
+  begin
     sheet = Tools::contact_sheet_with_options video, options
     sheet.initialize_filename(options[:output][index]) if options[:output][index]
     sheet.build
+  rescue Exception => e
+    errors[video] = e
+    STDERR.puts "ERROR: #{e.message}"
+    STDERR.puts "#{e.backtrace.join("\n")}" if options[:verbose]
+    break unless options[:continue]
   end
-rescue Exception => e
-  STDERR.puts "ERROR: #{e.message}"
-  STDERR.puts "#{e.backtrace.join("\n")}" if options[:verbose]
 end
 
+if options[:continue] && errors.length > 0
+  errors.each do |video, e|
+    STDERR.puts "File: #{video}"
+    STDERR.puts "ERROR: #{e.message}"
+ end
+ STDERR.puts "Total: #{errors.length} Errors"
+end
