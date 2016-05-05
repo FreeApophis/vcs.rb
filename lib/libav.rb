@@ -104,10 +104,14 @@ module VCSRuby
     end
 
     def format_split line
-      e = line[ENCODING_SUPPORT] == 'E'
-      v = line[VIDEO_CODEC] == 'V'
+      correction = 0
+      unless line[0] == ' '
+        correction = 1
+      end
+      e = line[ENCODING_SUPPORT - correction] == 'E'
+      v = line[VIDEO_CODEC - correction] == 'V'
 
-      name = line[NAME..-1].split(' ', 2).first
+      name = line[NAME-correction..-1].split(' ', 2).first
       return name, e, v
     rescue
       return nil, false, false
