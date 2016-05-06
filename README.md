@@ -54,7 +54,74 @@ To extract the images from the videos you can select your preferred capturer. Cu
 
 ### Using with Paperclip, Carrierwave, Refile
 
-Not yet tried. Any feedback welcome.
+It is pretty simple to include the Contact Sheet into CarrierWave, however the processing will be done after the upload which 
+might take quite some time. It is recommendet to use something like carrierwave_backgrounder to make the processing not during
+the upload.
+
+Here is a working example in Carrierwave:
+
+```ruby
+class VideoUploader < CarrierWave::Uploader::Base
+  include CarrierWave::MiniMagick
+
+  storage :file
+
+  def store_dir
+    "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
+  end
+
+  version :contact_sheet do 
+    process :contact_sheet_processor
+  end
+
+  def contact_sheet_format end 
+    :png
+  end
+
+  def cs_url
+    "#{File.dirname(url)}/#{File.basename(url,'.*')}.#{contact_sheet_format}"
+  end 
+
+  def contact_sheet_processor
+    # input
+    directory = File.dirname(current_path)
+    tmpfile = File.join(directory, 'tmpfile')
+    File.rename(current_path, tmpfile)
+
+    # output
+    new_name = File.basename(current_path, '.*') + '.' + contact_sheet_format.to_s
+    current_extenstion = File.extname(current_path).gsub('.', '')
+    encoded_file = File.join(directory, new_name)
+
+    # create cs
+    cs = VCSRuby::ContactSheet.new tmpfile
+
+    cs.initialize_filename(encoded_file)
+    cs.format = contact_sheet_format
+    cs.title = model.name
+    cs.signature = nil 
+    cs.thumbnail_width = 320
+    cs.timestamp = false
+    cs.softshadow = false
+
+    cs.build
+
+    # without this lines processed video files will remain in cache folder
+    self.filename[-current_extenstion.size..-1] = contact_sheet_format.to_s
+    self.file.file[-current_extenstion.size..-1] = contact_sheet_format.to_s
+
+    File.delete(tmpfile)
+  end
+end 
+```
+
+#### show.html.erb
+
+The cs_url alternative gives you the right path. This is not very nice though. A solution to just correct the url would be appreciated.
+
+```ruby
+  <%=  image_tag @video.video.contact_sheet.cs_url %>
+```
 
 ## Script
 
