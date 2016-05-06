@@ -58,7 +58,7 @@ module VCSRuby
       sheet.to = options[:to] if options[:to]
       sheet.highlight = options[:highlight] if options[:highlight]
 
-      sheet.timestamps = options[:timestamps] if options[:timestamps] != nil
+      sheet.timestamp = options[:timestamp] if options[:timestamp] != nil
       sheet.softshadow = options[:softshadow] if options[:softshadow] != nil
       sheet.polaroid = options[:polaroid] if options[:polaroid] != nil
 
