@@ -61,6 +61,10 @@ the upload.
 Here is a working example in Carrierwave:
 
 ```ruby
+# encoding: utf-8
+
+require "vcs"
+
 class VideoUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
