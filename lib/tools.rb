@@ -12,24 +12,6 @@ module VCSRuby
       return ((RUBY_PLATFORM =~ /linux/) or (RbConfig::CONFIG['host_os'] =~ /linux/i))
     end
 
-    def self.verbose= verbose
-      @verbose = verbose
-      @quiet = false if @verbose
-    end
-
-    def self.verbose?
-      @verbose
-    end
-
-    def self.quiet= quiet
-      @quiet = quiet
-      @verbose = false if @quiet
-    end
-
-    def self.quiet?
-      @quiet
-    end
-
     def self.list_arguments arguments
       arguments.map{ |argument| argument.to_s }.join(', ')
     end

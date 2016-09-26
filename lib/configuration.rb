@@ -3,7 +3,7 @@
 #
 
 require 'font'
-
+require 'singleton'
 
 class ::Hash
     def deep_merge(second)
@@ -14,10 +14,12 @@ end
 
 module VCSRuby
   class Configuration
-    attr_accessor :capturer
+    include Singleton
+    
     attr_reader :header_font, :title_font, :timestamp_font, :signature_font
+    attr_writer :verbose, :quiet
 
-    def initialize profile
+    def initialize
       default_config_file = File.expand_path("defaults.yml", File.dirname(__FILE__))
       @config = ::YAML::load_file(default_config_file)
 
@@ -28,8 +30,6 @@ module VCSRuby
         @config = @config.deep_merge(local_config)
       end
 
-      load_profile profile if profile
-      
       @header_font    = Font.new @config['style']['header']['font'],    @config['style']['header']['size']
       @title_font     = Font.new @config['style']['title']['font'],     @config['style']['title']['size']
       @timestamp_font = Font.new @config['style']['timestamp']['font'], @config['style']['timestamp']['size']
@@ -52,6 +52,18 @@ module VCSRuby
       raise "No profile '#{profile}' found" unless found
     end
 
+    def verbose?
+      @verbose
+    end
+
+    def quiet?
+      @quiet
+    end
+    
+    def capturer
+      @capturer || :any
+    end
+    
     def rows
       @config['main']['rows'] ? @config['main']['rows'].to_i : nil
     end

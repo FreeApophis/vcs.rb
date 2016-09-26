@@ -1,29 +1,27 @@
 #
-# Thumbnails from video
+# Frame from video
 #
 
 require 'mini_magick'
 
 module VCSRuby
-  class Thumbnail
+  class Frame
     attr_accessor :width, :height, :aspect
     attr_accessor :image_path
-    attr_accessor :time
-    attr_reader :filters
+    attr_reader :filters, :time
 
-    def initialize capper, video, configuration
-      @capper = capper
+    def initialize video, time
       @video = video
-      @configuration = configuration
+      @time = time
       @filters = []
     end
 
     def capture
-      @capper.grab @time, @image_path
+      @video.capturer.grab @time, @image_path
     end
 
-    def capture_and_evade interval
-      times = [TimeIndex.new] + @configuration.blank_alternatives
+    def capture_and_evade interval = @video.duration
+      times = [TimeIndex.new] + Configuration.instance.blank_alternatives
       times.select! { |t| (t < interval / 2) and (t > interval / -2) }
       times.map! { |t| @time + t }
 
@@ -31,8 +29,8 @@ module VCSRuby
         @time = time
         capture
         break unless blank?
-        puts "Blank frame detected. => #{@time}" unless Tools::quiet?
-        puts "Giving up!" if time == times.last && !Tools::quiet?
+        puts "Blank frame detected. => #{@time}" unless Configuration.instance.quiet?
+        puts "Giving up!" if time == times.last && !Configuration.instance.quiet?
       end
     end
 
@@ -40,7 +38,7 @@ module VCSRuby
       image = MiniMagick::Image.open @image_path
       image.colorspace 'Gray'
       mean = image['%[fx:image.mean]'].to_f
-      return mean < @configuration.blank_threshold
+      return mean < Configuration.instance.blank_threshold
     end
 
     def apply_filters
@@ -76,12 +74,12 @@ private
 
     def timestamp_filter convert
       convert.stack do |box|
-        box.box @configuration.timestamp_background
-        box.fill  @configuration.timestamp_color
-        box.pointsize @configuration.timestamp_font.size
+        box.box Configuration.instance.timestamp_background
+        box.fill Configuration.instance.timestamp_color
+        box.pointsize Configuration.instance.timestamp_font.size
         box.gravity 'SouthEast'
-        if @configuration.timestamp_font.exists?
-          box.font @configuration.timestamp_font.path 
+        if Configuration.instance.timestamp_font.exists?
+          box.font Configuration.instance.timestamp_font.path 
         end
         box.annotate('+10+10', " #{@time.to_timestamp} ")
       end
