@@ -12,9 +12,21 @@ module VCSRuby
       initialize_filename video
       initialize_capturers
     end
-
+    
     def valid?
-      capturer.valid?
+      capturer.file_valid?
+    end
+
+    def streams
+      capturer.streams
+    end
+    
+    def video_streams
+      capturer.streams.select{ |stream| stream.codec_type == 'video' }
+    end
+    
+    def audio_streams
+      capturer.streams.select{ |stream| stream.codec_type == 'audio' }
     end
 
     def full_path
@@ -33,49 +45,41 @@ module VCSRuby
       capturer.format['size'].to_i
     end
 
-    def video_stream
-      capturer.video_streams.first
-    end
-
     def video_codec
-      capturer.video_streams.first['codec_long_name']      
+      video_streams.first.codec_long_name
     end
 
-    def colorspace
-      capturer.video_streams.first['color_space']
+    def color_space
+      video_streams.first.color_space
     end
 
     def resolution
-      "#{capturer.video_streams.first['width']}x#{capturer.video_streams.first['height']}"
+      "#{video_streams.first.width}x#{video_streams.first.height}"
     end
 
     def width
-      capturer.video_streams.first['width'].to_i
+      video_streams.first.width.to_i
     end
 
     def height
-      capturer.video_streams.first['height'].to_i
+      video_streams.first.height.to_i
     end
 
     def frame_rate
-      parts = capturer.video_streams.first['r_frame_rate'].split('/')
+      parts = video_streams.first.r_frame_rate.split('/')
       return parts[0].to_f / parts[1].to_f
     end
 
-    def audio_stream
-      capturer.audio_streams.first
-    end
-
     def audio_codec
-      capturer.audio_streams.first['codec_long_name']      
+      audio_streams.first.codec_long_name
     end
 
     def audio_sample_rate
-      capturer.audio_streams.first['sample_rate']      
+      audio_streams.first.sample_rate
     end
 
     def audio_channels
-      capturer.audio_streams.first['channels']      
+      audio_streams.first.channels
     end
 
     def contact_sheet

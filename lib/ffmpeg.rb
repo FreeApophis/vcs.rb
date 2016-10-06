@@ -14,7 +14,7 @@ module VCSRuby
     VIDEO_CODEC = 3
     NAME = 8
     
-    attr_reader :format, :video_streams, :audio_streams
+    attr_reader :format, :streams
 
     def initialize video
       @video = video
@@ -24,7 +24,7 @@ module VCSRuby
       detect_version if available?
     end
        
-    def valid?
+    def file_valid?
       return probe_meta_information
     end
 
@@ -84,11 +84,7 @@ private
     end
 
     def probe_meta_information
-      return true if @cache
-
-      @cache = @ffprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
-      puts @cache if Configuration.instance.verbose?
-
+      check_cache
       parse_meta_info
       return true
     rescue Exception => e
@@ -96,7 +92,13 @@ private
       return false
     end
     
-    def get_hash defines
+    def check_cache
+      unless @cache
+        @cache = @ffprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
+      end
+    end
+    
+    def get_hash defines     
       result = {}
       defines.lines.each do |line|
         kv = line.split("=")
@@ -106,19 +108,21 @@ private
     end
     
     def parse_meta_info
-      format = /\[FORMAT\](.*?)\[\/FORMAT\]/m.match(@cache)
-      if format       
-        @format = get_hash(format[1])
+      parse_format
+      parse_streams
+    end
+
+    def parse_format
+      @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
+        @format = get_hash(format[0])
       end
-      @video_streams = []
-      @audio_streams = []
+    end
+
+    def parse_streams
+      @streams = []
       @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
-        hash = get_hash(stream[0])
-        @video_streams << hash if hash['codec_type'] == 'video'
-        @audio_streams << hash if hash['codec_type'] == 'audio'
+        @streams << Stream.new(get_hash(stream[0]))
       end
-      puts @video_streams.count
-      puts @audio_streams.count
     end
   end
 end
