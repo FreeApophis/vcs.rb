@@ -10,17 +10,18 @@ module VCSRuby
     attr_accessor :image_path
     attr_reader :filters, :time
 
-    def initialize video, time
+    def initialize video, capturer, time
       @video = video
+      @capturer = capturer
       @time = time
       @filters = []
     end
 
     def capture
-      @video.capturer.grab @time, @image_path
+      @capturer.grab @time, @image_path
     end
 
-    def capture_and_evade interval = @video.duration
+    def capture_and_evade interval = @video.info.duration
       times = [TimeIndex.new] + Configuration.instance.blank_alternatives
       times.select! { |t| (t < interval / 2) and (t > interval / -2) }
       times.map! { |t| @time + t }
@@ -79,7 +80,7 @@ private
         box.pointsize Configuration.instance.timestamp_font.size
         box.gravity 'SouthEast'
         if Configuration.instance.timestamp_font.exists?
-          box.font Configuration.instance.timestamp_font.path 
+          box.font Configuration.instance.timestamp_font.path
         end
         box.annotate('+10+10', " #{@time.to_timestamp} ")
       end

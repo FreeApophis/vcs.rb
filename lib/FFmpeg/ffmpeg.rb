@@ -13,17 +13,17 @@ module VCSRuby
     ENCODING_SUPPORT = 2
     VIDEO_CODEC = 3
     NAME = 8
-    
-    attr_reader :format, :streams
+
+    attr_reader :info, :video_streams, :audio_streams
 
     def initialize video
       @video = video
       @ffmpeg = Command.new :ffmpeg, 'ffmpeg'
       @ffprobe = Command.new :ffmpeg, 'ffprobe'
-      
+
       detect_version if available?
     end
-       
+
     def file_valid?
       return probe_meta_information
     end
@@ -91,14 +91,14 @@ private
       puts e
       return false
     end
-    
+
     def check_cache
       unless @cache
         @cache = @ffprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
       end
     end
-    
-    def get_hash defines     
+
+    def get_hash defines
       result = {}
       defines.lines.each do |line|
         kv = line.split("=")
@@ -106,23 +106,39 @@ private
       end
       result
     end
-    
+
     def parse_meta_info
       parse_format
-      parse_streams
+      parse_audio_streams
+      parse_video_streams
     end
 
     def parse_format
       @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
-        @format = get_hash(format[0])
+        @info = FFmpegMetaInfo.new(get_hash(format[0]))
       end
     end
 
-    def parse_streams
-      @streams = []
+    def parse_audio_streams
+      @audio_streams = []
       @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
-        @streams << Stream.new(get_hash(stream[0]))
+        info = get_hash(stream[0])
+        if info['codec_type'] == 'audio'
+          @audio_streams << FFmpegAudioStream.new(info)
+        end
       end
     end
+
+    def parse_video_streams
+      @video_streams = []
+      @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
+        info = get_hash(stream[0])
+        if info['codec_type'] == 'video'
+          @video_streams << FFmpegVideoStream.new(info)
+        end
+      end
+    end
+
+
   end
 end

@@ -9,7 +9,7 @@ module VCSRuby
     def available?
       false
     end
-    
+
     def self.initialize_capturers video
       capturers = []
 
@@ -18,11 +18,11 @@ module VCSRuby
 
     def self.create
       capturers = []
-      
+
       capturers << LibAV.new(video)
       capturers << MPlayer.new(video)
       capturers << FFmpeg.new(video)
-    
+
       return capturers.first
     end
 

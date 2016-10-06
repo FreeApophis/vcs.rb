@@ -10,13 +10,14 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet
-    attr_accessor :capturer, :format, :signature, :title, :highlight
+    attr_accessor :format, :signature, :title, :highlight
     attr_accessor :softshadow, :timestamp, :polaroid
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
 
-    def initialize video
+    def initialize video, capturer
       @video = video
+      @capturer = capturer
       @signature = "Created by Video Contact Sheet Ruby"
       initialize_filename
       
@@ -32,7 +33,7 @@ module VCSRuby
       @filters = []
       
       @from = TimeIndex.new 0
-      @to = @video.duration
+      @to = @video.info.duration
       
       @timestamp = Configuration.instance.timestamp
       @softshadow = Configuration.instance.softshadow
@@ -124,7 +125,7 @@ module VCSRuby
     end
 
     def build
-      @video.capturer.format = @video.capturer.available_formats.first
+      @capturer.format = @capturer.available_formats.first
       initialize_filters
       initialize_thumbnails
       capture_thumbnails
@@ -154,11 +155,11 @@ private
     def initialize_thumbnails
       time = @from
       (1..number_of_caps).each do |i|
-        thumb = Frame.new @video, time
+        thumb = Frame.new @video, @capturer, time
         time = time + interval
         thumb.width = thumbnail_width
         thumb.height = thumbnail_height
-        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.#{@video.capturer.format.to_s}")
+        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.#{@capturer.format.to_s}")
         thumb.filters.push(*@filters)
 
         @thumbnails << thumb
@@ -185,15 +186,15 @@ private
     end
 
     def detect_length
-      @length = @video.duration
+      @length = @video.info.duration
 
       @from = TimeIndex.new 0.0
       @to = @length
     end
 
     def detect_dimensions
-      @thumbnail_width = @video.width
-      @thumbnail_height = @video.height
+      @thumbnail_width = @video.video.width
+      @thumbnail_height = @video.video.height
     end
 
     def montage_thumbs
@@ -325,7 +326,7 @@ private
             b.gravity 'East'
             b.fill Configuration.instance.header_color
             b.annotate '+0-1'
-            b << "Dimensions: #{@video.width}x#{@video.height}\nFormat: #{@video.video_codec} / #{@video.audio_codec}\nFPS: #{"%.02f" % @video.frame_rate}"
+            b << "Dimensions: #{@video.video.width}x#{@video.video.height}\nFormat: #{@video.video.codec} / #{@video.audio.codec}\nFPS: #{"%.02f" % @video.video.frame_rate.to_f}"
           end
           a.bordercolor Configuration.instance.header_background
           a.border 9
