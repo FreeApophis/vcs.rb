@@ -74,12 +74,12 @@ optparse = OptionParser.new do|opts|
   opts.on('-C [CAPTURER]', '--capture [CAPTURER]', arguments['--capturer'], 'Capturer: ' + Tools::list_arguments(arguments["--capturer"])) do |capturer|
     options[:capturer] = capturer
   end
-  opts.on( '-T [TITLE]', '--title [TITLE]', 'Set ending time. No caps beyond this.') do |title|
+  opts.on( '-T [TITLE]', '--title [TITLE]', 'Set Title') do |title|
     options[:title] = title
   end
   opts.on( '-o [FILE]', '--output [FILE]', 'File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.') do |file|
     options[:output] << file
-  end	
+  end
   opts.on( '-s [SIGNATURE]', '--signature [SIGNATURE]', 'Change the image signature to your preference.') do |signature|
     options[:signature] = signature
   end
@@ -141,8 +141,8 @@ optparse.parse!
 
 Tools::print_help optparse if options[:help] || ARGV.empty?
 
-Tools::verbose = options[:verbose]
-Tools::quiet = options[:quiet]
+Configuration.instance.verbose = options[:verbose]
+Configuration.instance.quiet = options[:quiet]
 
 # Invoke ContactSheet
 

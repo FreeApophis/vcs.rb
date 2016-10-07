@@ -15,9 +15,9 @@ end
 module VCSRuby
   class Configuration
     include Singleton
-    
+
     attr_reader :header_font, :title_font, :timestamp_font, :signature_font
-    attr_writer :verbose, :quiet
+    attr_writer :verbose, :quiet, :capturer
 
     def initialize
       default_config_file = File.expand_path("defaults.yml", File.dirname(__FILE__))
@@ -25,7 +25,6 @@ module VCSRuby
 
       local_config_files = ['~/.vcs.rb.yml']
       local_config_files.select{ |f| File.exists?(f) }.each do |local_config_file|
-        puts "Local configuration file loaded: #{local_config_file}" if Tools.verbose?
         local_config = YAML::load_file(local_config_file)
         @config = @config.deep_merge(local_config)
       end
@@ -42,7 +41,7 @@ module VCSRuby
       found = false
       profiles.each do |profile|
         if File.exists?(profile)
-          puts "Profile loaded: #{profile}" if Tools.verbose?
+          puts "Profile loaded: #{profile}" if verbose?
           config = YAML::load_file(profile)
           @config = @config.deep_merge(config)
           found = true
@@ -59,11 +58,11 @@ module VCSRuby
     def quiet?
       @quiet
     end
-    
+
     def capturer
       @capturer || :any
     end
-    
+
     def rows
       @config['main']['rows'] ? @config['main']['rows'].to_i : nil
     end

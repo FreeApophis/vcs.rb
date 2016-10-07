@@ -46,9 +46,9 @@ module VCSRuby
 
     end
 
-    def initialize_filename
+    def initialize_filename override = nil
       @out_path = File.dirname(@video.full_path)
-      @out_filename = File.basename(@video.full_path,'.*')
+      @out_filename = File.basename(override || @video.full_path,'.*')
     end
 
     def initialize_geometry(rows, columns, interval)
@@ -57,7 +57,7 @@ module VCSRuby
       @columns = columns
       @interval = interval
     end
-    
+
     def filename
       "#{@out_filename}.#{@format ? @format.to_s : 'png'}"
     end

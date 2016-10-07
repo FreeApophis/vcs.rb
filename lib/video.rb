@@ -80,7 +80,7 @@ private
       end
 
       unless result
-        raise "Selected Capturer (#{@capturer.to_s}) not available. Install one of these: #{@capturers.map{ |c| c.name }.join(', ')}"
+        raise "Selected Capturer (#{Configuration.instance.capturer}) not available. Install one of these: #{@capturers.map{ |c| c.name }.join(', ')}"
       end
 
       return result

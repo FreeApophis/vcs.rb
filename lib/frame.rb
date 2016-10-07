@@ -116,7 +116,11 @@ private
         a.fill 'White'
         a.background 'White'
         a.bordercolor 'White'
-        a.mattecolor 'White'
+        if Tools.magick_version.major > 6
+          a.alpha_color 'White'
+        else
+          a.mattecolor 'White'
+        end
         a.frame "#{border}x#{border}"
         a.stack do |b|
           b.flip
