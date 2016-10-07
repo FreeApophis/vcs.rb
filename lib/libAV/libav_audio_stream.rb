@@ -1,10 +1,10 @@
 #
-# Implementes AudioStream Interface for FFmpeg
+# Implementes AudioStream Interface for libAV
 #
 
 # AudioStream = Struct.new(:codec, :channels, :channel_layout, :sample_rate, :bit_rate, :raw)
 module VCSRuby
-  class FFmpegAudioStream
+  class LibAVAudioStream
     attr_reader :raw
 
     def initialize audio_stream

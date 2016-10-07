@@ -1,11 +1,11 @@
 #
-# Implementes VideoStream Interface for FFmpeg
+# Implementes VideoStream Interface for libAV
 #
 
 # VideoStream = Struct.new(:width, :height, :codec, :color_space, :bit_rate, :frame_rate, :aspect_ratio, :raw)
 
 module VCSRuby
-  class FFmpegVideoStream
+  class LibAVVideoStream
     attr_reader :raw
 
     def initialize video_stream

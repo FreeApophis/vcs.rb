@@ -1,5 +1,5 @@
 #
-# FFmpeg Abstraction
+# libAV Abstraction
 #
 
 require 'capturer'

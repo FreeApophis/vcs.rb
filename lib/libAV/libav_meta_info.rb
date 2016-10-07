@@ -1,5 +1,5 @@
 #
-# Implementes MetaInfo Interface for FFmpeg
+# Implementes MetaInfo Interface for libAV
 #
 
 # MetaInformation = Struct.new(:duration, :bit_rate, :size, :format, :extension, :raw)
@@ -7,7 +7,7 @@
 require_relative '../time_index'
 
 module VCSRuby
-  class FFmpegMetaInfo
+  class LibAVMetaInfo
     attr_reader :raw
 
     def initialize meta_info
