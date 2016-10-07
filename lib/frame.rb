@@ -21,9 +21,11 @@ module VCSRuby
       @capturer.grab @time, @image_path
     end
 
-    def capture_and_evade interval = @video.info.duration
+    def capture_and_evade interval = nil
       times = [TimeIndex.new] + Configuration.instance.blank_alternatives
-      times.select! { |t| (t < interval / 2) and (t > interval / -2) }
+      if interval
+        times.select! { |t| (t < interval / 2) and (t > interval / -2) }
+      end
       times.map! { |t| @time + t }
 
       times.each do |time|
