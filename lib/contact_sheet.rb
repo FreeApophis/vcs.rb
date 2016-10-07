@@ -20,21 +20,21 @@ module VCSRuby
       @capturer = capturer
       @signature = "Created by Video Contact Sheet Ruby"
       initialize_filename
-      
+
       if Configuration.instance.verbose?
         puts "Processing #{File.basename(video.full_path)}..."
       end
-      
+
       return unless @video.valid?
-      
+
       detect_video_properties
 
       @thumbnails = []
       @filters = []
-      
+
       @from = TimeIndex.new 0
       @to = @video.info.duration
-      
+
       @timestamp = Configuration.instance.timestamp
       @softshadow = Configuration.instance.softshadow
       @polaroid = Configuration.instance.polaroid
@@ -75,7 +75,7 @@ module VCSRuby
     end
 
     def interval
-      @interval || (@to - @from) / (number_of_caps + 1)
+      @interval || (@to - @from) / (number_of_caps)
     end
 
     def number_of_caps
@@ -125,21 +125,25 @@ module VCSRuby
     end
 
     def build
-      @capturer.format = @capturer.available_formats.first
-      initialize_filters
-      initialize_thumbnails
-      capture_thumbnails
+      if (@video.info.duration.total_seconds < 1.0)
+        puts "Video is shorter than 1 sec"
+      else
+        @capturer.format = @capturer.available_formats.first
+        initialize_filters
+        initialize_thumbnails
+        capture_thumbnails
 
-      puts "Composing standard contact sheet..." unless Configuration.instance.quiet?
-      montage = splice_montage(montage_thumbs)
+        puts "Composing standard contact sheet..." unless Configuration.instance.quiet?
+        montage = splice_montage(montage_thumbs)
 
-      image = MiniMagick::Image.open(montage)
+        image = MiniMagick::Image.open(montage)
 
-      puts "Adding header and footer..." unless Configuration.instance.quiet?
-      final = add_header_and_footer image
+        puts "Adding header and footer..." unless Configuration.instance.quiet?
+        final = add_header_and_footer image
 
-      puts "Done. Output wrote to '#{filename}'" unless Configuration.instance.quiet?
-      FileUtils.mv(final, full_path)
+        puts "Done. Output wrote to '#{filename}'" unless Configuration.instance.quiet?
+        FileUtils.mv(final, full_path)
+      end
     end
 
 
@@ -219,7 +223,7 @@ private
         bottom = right = Configuration.instance.padding
       else
         left = right = top = bottom = Configuration.instance.padding
-      end 
+      end
 
 
       file_path = File::join(@tempdir, 'spliced.png')
@@ -312,7 +316,7 @@ private
               c.label File.basename(@video.full_path)
               c.append.+
             end
-            if Configuration.instance.header_font.exists?            
+            if Configuration.instance.header_font.exists?
               b.font Configuration.instance.header_font.path
             end
             b.label "File size: #{Tools.to_human_size(File.size(@video.full_path))}"
@@ -326,7 +330,7 @@ private
             b.gravity 'East'
             b.fill Configuration.instance.header_color
             b.annotate '+0-1'
-            b << "Dimensions: #{@video.video.width}x#{@video.video.height}\nFormat: #{@video.video.codec} / #{@video.audio.codec}\nFPS: #{"%.02f" % @video.video.frame_rate.to_f}"
+            b << "Dimensions: #{@video.video.width}x#{@video.video.height}\nFormat: #{@video.video.codec(true)} / #{@video.audio.codec(true)}\nFPS: #{"%.02f" % @video.video.frame_rate.to_f}"
           end
           a.bordercolor Configuration.instance.header_background
           a.border 9

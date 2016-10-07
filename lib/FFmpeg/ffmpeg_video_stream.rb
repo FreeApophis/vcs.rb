@@ -20,8 +20,12 @@ module VCSRuby
       @raw['height'].to_i
     end
 
-    def codec
-      @raw['codec_long_name']
+    def codec short = false
+      if short
+        @raw['codec_name']
+      else
+        @raw['codec_long_name']
+      end
     end
 
     def color_space

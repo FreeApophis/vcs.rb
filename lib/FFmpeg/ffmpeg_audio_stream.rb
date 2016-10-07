@@ -2,7 +2,7 @@
 # Implementes AudioStream Interface for FFmmpeg
 #
 
-# AudioStream = Struct.new(:codec, :channels, :sample_rate, :bit_rate, :raw)
+# AudioStream = Struct.new(:codec, :channels, :channel_layout, :sample_rate, :bit_rate, :raw)
 module VCSRuby
   class FFmpegAudioStream
     attr_reader :raw
@@ -11,8 +11,12 @@ module VCSRuby
       @raw = audio_stream
     end
 
-    def codec
-      @raw['codec_long_name']
+    def codec short = false
+      if short
+        @raw['codec_name']
+      else
+        @raw['codec_long_name']
+      end
     end
 
     def channels

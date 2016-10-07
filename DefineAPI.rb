@@ -2,9 +2,9 @@ require_relative 'lib/vcs'
 
 VCSRuby::Configuration.instance.verbose = true
 
-#video = VCSRuby::Video.new "ons3on3cup_hdtv.mp4"
+video = VCSRuby::Video.new "ons3on3cup_hdtv.mp4"
 #video = VCSRuby::Video.new "fat_vs_flat.nsv"
-video = VCSRuby::Video.new "3years UT2k4_PPC_VGA.avi"
+#video = VCSRuby::Video.new "3years UT2k4_PPC_VGA.avi"
 
 puts "valid?: #{video.valid?}"
 
