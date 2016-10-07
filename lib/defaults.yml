@@ -36,4 +36,4 @@ style:
 lowlevel:
   blank_evasion: true
   blank_threshold: 0.08
-  blank_alternatives: [ -2, 2, -5, 5, -10, 10, -15, 15, -30, 30]
+  blank_alternatives: [ -2, 2, -5, 5, -10, 10, -15, 15, -30, 30, 0]
