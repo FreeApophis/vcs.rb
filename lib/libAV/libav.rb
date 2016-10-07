@@ -9,15 +9,13 @@ require 'time_index'
 module VCSRuby
   class LibAV < Capturer
 
-    CODEC = 2
-    DIMENSION = 4
-    FPS = 6
-
     HEADER = 10
 
     ENCODING_SUPPORT = 2
     VIDEO_CODEC = 3
     NAME = 8
+
+    attr_reader :info, :video_streams, :audio_streams
 
     def initialize video
       @video = video
@@ -25,6 +23,10 @@ module VCSRuby
       @avprobe = Command.new :libav, 'avprobe'
       
       detect_version if available?
+    end
+
+    def file_valid?
+      return probe_meta_information
     end
 
     def name
@@ -39,54 +41,15 @@ module VCSRuby
     def detect_version
       info = @avconv.execute('-version')
       match = /avconv ([\d|.|-|:]*)/.match(info)
-      @version = match[1] if match
+      if match
+        @version = match[1]
+      end
     end
 
-    def length
-      load_probe
-      match = /Duration: ([\d|:|.]*)/.match(@cache)
-      return TimeIndex.new match[1]
-    end
 
-    def width
-      load_probe
-      @width
-    end
-
-    def height
-      load_probe
-      @height
-    end
-
-    def par
-      load_probe
-      @par
-    end
-
-    def dar
-      load_probe
-      @dar
-    end
-
-    def fps
-      load_probe
-      @fps
-    end
-
-    def video_codec
-      load_probe
-
-      @video_codec
-    end
-
-    def audio_codec
-      load_probe
-
-      @audio_codec
-    end
 
     def grab time, image_path
-      @avconv.execute "-y -ss #{time.total_seconds} -i \"#{@video}\" -an -dframes 1 -vframes 1 -vcodec #{format} -f rawvideo \"#{image_path}\""
+      @avconv.execute "-y -ss #{time.total_seconds} -i \"#{@video.full_path}\" -an -dframes 1 -vframes 1 -vcodec #{format} -f rawvideo \"#{image_path}\""
     end
 
     def available_formats
@@ -103,6 +66,11 @@ module VCSRuby
       image_formats.select{ |format| formats.include?(format) }.map(&:to_sym)
     end
 
+    def to_s
+      "LibAV #{@version}"
+    end
+
+private
     def format_split line
       correction = 0
       unless line[0] == ' '
@@ -117,65 +85,60 @@ module VCSRuby
       return nil, false, false
     end
 
-    def to_s
-      "LibAV #{@version}"
+    def probe_meta_information
+      check_cache
+      parse_meta_info
+      return true
+    rescue Exception => e
+      puts e
+      return false
     end
 
-private
-    def load_probe
-      return if @cache
+    def check_cache
+      unless @cache
+        @cache = @avprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
+      end
+    end
 
-      @cache = @avprobe.execute("\"#{@video}\"", "2>&1")
-      puts @cache if Tools.verbose?
+    def get_hash defines
+      result = {}
+      defines.lines.each do |line|
+        kv = line.split("=")
+        result[kv[0].strip] = kv[1].strip if kv.count == 2
+      end
+      result
+    end
 
-      parse_video_streams
+    def parse_meta_info
+      parse_format
       parse_audio_streams
+      parse_video_streams
     end
 
-    def parse_video_streams
-      video_stream = split_stream_line(is_stream?(@cache, /Video/).first)
-
-      dimensions = /(\d*)x(\d*) \[PAR (\d*:\d*) DAR (\d*:\d*)\]/.match(video_stream[DIMENSION])
-
-      if dimensions
-        @par = dimensions[3]
-        @dar = dimensions[4]
-      else
-        dimensions = /(\d*)x(\d*)/.match(video_stream[DIMENSION])
+    def parse_format
+      @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
+        @info = LibAVMetaInfo.new(get_hash(format[0]))
       end
-
-      if dimensions
-        @width = dimensions[1].to_i
-        @height = dimensions[2].to_i
-      end
-
-      fps = /([\d|.]+) fps/.match(video_stream[FPS])
-      @fps = fps ? fps[1].to_f : 0.0
-
-      @video_codec = video_stream[CODEC]
     end
 
     def parse_audio_streams
-      audio_stream = split_stream_line(is_stream?(@cache, /Audio/).first)
-
-      @audio_codec = audio_stream[CODEC]
+      @audio_streams = []
+      @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
+        info = get_hash(stream[0])
+        if info['codec_type'] == 'audio'
+          @audio_streams << LibAVAudioStream.new(info)
+        end
+      end
     end
 
-    def is_stream? probe, regex
-      streams(probe).select{ |s| s =~ regex }
-    end
-
-    def streams probe
-      @cache.split(/\r?\n/).map(&:strip).select{|l| l.start_with? 'Stream' }
-    end
-
-    def split_stream_line line
-      return [nil, nil, 'none'] unless line
-      parts = line.split(',')
-      stream = parts.shift
-      result = stream.split(':')
-      result += parts
-      return result.map(&:strip)
+    def parse_video_streams
+      @video_streams = []
+      @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
+        info = get_hash(stream[0])
+        if info['codec_type'] == 'video'
+          @video_streams << LibAVVideoStream.new(info)
+        end
+      end
     end
   end
 end

@@ -47,13 +47,20 @@ if video.valid?
 
   puts "File: #{video.full_path}"
   frame = video.frame VCSRuby::TimeIndex.new(0)
-  frame.image_path = "blank.jpg"
+  frame.filename = "blank.jpg"
+  puts frame.filename
+
   frame.capture
-  frame.image_path = "evade.jpg"
+  frame.filename = "evade.png"
+  frame.format = :png
   frame.capture_and_evade
 
   cs = video.contact_sheet
   cs.thumbnail_width = 240
+  cs.initialize_filename "cs.jpg"
+  cs.build
+  
+  cs.initialize_filename "cs.png"
   cs.build
 end
 

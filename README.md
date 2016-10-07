@@ -34,7 +34,7 @@ vcs.rb has several applications in mind
   sheet.build
   
   frame = video.frame VCSRuby::TimeIndex.new('1:22')
-  frame.image_path = "frame.jpg"
+  frame.filename = "frame.jpg"
   frame.capture_and_evade # evade blank frames
 ```
 

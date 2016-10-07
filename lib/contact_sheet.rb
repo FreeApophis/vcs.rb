@@ -10,7 +10,7 @@ require 'vcs'
 
 module VCSRuby
   class ContactSheet
-    attr_accessor :format, :signature, :title, :highlight
+    attr_accessor :signature, :title, :highlight
     attr_accessor :softshadow, :timestamp, :polaroid
     attr_reader :thumbnail_width, :thumbnail_height
     attr_reader :length, :from, :to
@@ -49,6 +49,9 @@ module VCSRuby
     def initialize_filename override = nil
       @out_path = File.dirname(@video.full_path)
       @out_filename = File.basename(override || @video.full_path,'.*')
+
+      extension = override ?  File.extname(override) : ''
+      @format = extension.length > 0 ? extension : '.png'
     end
 
     def initialize_geometry(rows, columns, interval)
@@ -59,7 +62,7 @@ module VCSRuby
     end
 
     def filename
-      "#{@out_filename}.#{@format ? @format.to_s : 'png'}"
+      "#{@out_filename}#{@format}"
     end
 
     def full_path
@@ -120,7 +123,6 @@ module VCSRuby
       if (@video.info.duration.total_seconds < 1.0)
         puts "Video is shorter than 1 sec"
       else
-        @capturer.format = @capturer.available_formats.first
         initialize_filters
         initialize_thumbnails
         capture_thumbnails
@@ -160,7 +162,7 @@ private
         time = time + interval
         thumb.width = thumbnail_width
         thumb.height = thumbnail_height
-        thumb.image_path = File::join(@tempdir, "th#{"%03d" % i}.#{@capturer.format.to_s}")
+        thumb.filename = File::join(@tempdir, "th#{"%03d" % i}.#{@capturer.format_extension}")
         thumb.filters.push(*@filters)
 
         @thumbnails << thumb
@@ -203,7 +205,7 @@ private
       MiniMagick::Tool::Montage.new do |montage|
         montage.background Configuration.instance.contact_background
         @thumbnails.each do |thumbnail|
-          montage << thumbnail.image_path
+          montage << thumbnail.filename
         end
         montage.geometry "+#{Configuration.instance.padding}+#{Configuration.instance.padding}"
         # rows or columns can be nil (auto fit)
@@ -264,7 +266,7 @@ private
 
       thumb.width = thumbnail_width
       thumb.height = thumbnail_height
-      thumb.image_path = File::join(@tempdir, "highlight_thumb.png")
+      thumb.filename = File::join(@tempdir, "highlight_thumb.png")
       thumb.capture
       thumb.apply_filters
 
@@ -274,7 +276,7 @@ private
           a.size "#{montage.width}x#{thumbnail_height+20}"
           a.xc Configuration.instance.highlight_background
           a.gravity 'Center'
-          a << thumb.image_path
+          a << thumb.filename
           a.composite
         end
         convert.stack do |a|
@@ -350,7 +352,7 @@ private
           end
           convert.append
         end
-        if format == :jpg || format == :jpeg
+        if @format == :jpg || @format == :jpeg
           convert.quality(Configuration.instance.quality)
         end
         convert << file_path

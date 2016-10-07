@@ -43,7 +43,7 @@ module VCSRuby
     def detect_version
       info = @ffmpeg.execute('-version')
       match = /avconv ([\d|.|-|:]*)/.match(info)
-      @libav = true if match
+      @libav = !!match
       match = /ffmpeg version ([\d|.]*)/.match(info)
       if match
         @version = match[1]
@@ -51,7 +51,7 @@ module VCSRuby
     end
 
     def grab time, image_path
-      @ffmpeg.execute "-y -ss #{time.total_seconds} -i \"#{@video.full_path}\" -an -dframes 1 -vframes 1 -vcodec png -f rawvideo \"#{image_path}\""
+      @ffmpeg.execute "-y -ss #{time.total_seconds} -i \"#{@video.full_path}\" -an -dframes 1 -vframes 1 -vcodec #{format} -f rawvideo \"#{image_path}\""
     end
 
     def available_formats

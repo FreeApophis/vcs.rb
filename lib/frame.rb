@@ -7,7 +7,6 @@ require 'mini_magick'
 module VCSRuby
   class Frame
     attr_accessor :width, :height, :aspect
-    attr_accessor :image_path
     attr_reader :filters, :time
 
     def initialize video, capturer, time
@@ -17,8 +16,25 @@ module VCSRuby
       @filters = []
     end
 
+    def filename= file_path
+      @out_path = File.dirname(file_path)
+      @out_filename = File.basename(file_path,'.*')
+    end
+    
+    def filename
+      File.join(@out_path, "#{@out_filename}.#{@capturer.format_extension}")      
+    end
+    
+    def format= fmt
+      @capturer.format = fmt
+    end
+    
+    def format
+      @capturer.format
+    end
+
     def capture
-      @capturer.grab @time, @image_path
+      @capturer.grab @time, filename
     end
 
     def capture_and_evade interval = nil
@@ -38,7 +54,7 @@ module VCSRuby
     end
 
     def blank?
-      image = MiniMagick::Image.open @image_path
+      image = MiniMagick::Image.open filename
       image.colorspace 'Gray'
       mean = image['%[fx:image.mean]'].to_f
       return mean < Configuration.instance.blank_threshold
@@ -48,13 +64,13 @@ module VCSRuby
       MiniMagick::Tool::Convert.new do |convert|
         convert.background 'Transparent'
         convert.fill 'Transparent'
-        convert << @image_path
+        convert << filename
 
         sorted_filters.each do |filter|
           call_filter filter, convert
         end
 
-        convert << @image_path
+        convert << filename
       end
     end
 
