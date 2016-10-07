@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.description = "Creates a contact sheet, a preview, of a video, usable as library or as a script. Based on VCS *NIX. Creating Thumbnails with libav, ffmpeg or mplayer and compose it with ImageMagick into nice looking sheets."
   spec.authors     = ["Thomas Bruderer"]
   spec.email       = 'apophis@apophis.ch'
-  spec.files       = Dir['lib/*']
+  spec.files       = Dir['lib/**/*']
   spec.bindir      = 'bin'
   spec.executables << 'vcs.rb'
   spec.test_files  = Dir['test/*.rb']
