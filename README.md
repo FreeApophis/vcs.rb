@@ -253,5 +253,5 @@ style:signature:size | 10 | Size of the font for the signature
 style:signature:color | Black | Color of the text for the signature
 style:signature:background | SlateGray | Background color for the signature
 lowlevel:blank_evasion | true | try to avoid blank frames
-lowlevel:blank_threshold | 0.10 | median image brightness
-lowlevel:blank_alternatives | [ -5, 5, -10, 10, -30, 30] | Array of seconds around interval
+lowlevel:blank_threshold | 0.08 | median image brightness
+lowlevel:blank_alternatives | [ -5, 5, -10, 10, -30, 30, 0] | Array of seconds around interval
