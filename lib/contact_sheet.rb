@@ -51,19 +51,19 @@ module VCSRuby
       @out_filename = File.basename(@video.full_path,'.*')
     end
 
+    def initialize_geometry(rows, columns, interval)
+      @has_interval = !!interval
+      @rows = rows
+      @columns = columns
+      @interval = interval
+    end
+    
     def filename
       "#{@out_filename}.#{@format ? @format.to_s : 'png'}"
     end
 
     def full_path
       File.join(@out_path, filename)
-    end
-
-    def initialize_geometry(rows, columns, interval)
-      @has_interval = !!interval
-      @rows = rows
-      @columns = columns
-      @interval = interval
     end
 
     def rows
@@ -116,14 +116,6 @@ module VCSRuby
       end
     end
 
-
-    def self.finalize(tempdir)
-      proc do
-        puts "Cleaning up..." unless Configuration.instance.quiet?
-        FileUtils.rm_r tempdir
-      end
-    end
-
     def build
       if (@video.info.duration.total_seconds < 1.0)
         puts "Video is shorter than 1 sec"
@@ -146,8 +138,13 @@ module VCSRuby
       end
     end
 
-
 private
+    def self.finalize(tempdir)
+      proc do
+        puts "Cleaning up..." unless Configuration.instance.quiet?
+        FileUtils.rm_r tempdir
+      end
+    end
 
     def initialize_filters
       @filters << :resize_filter
@@ -157,7 +154,7 @@ private
     end
 
     def initialize_thumbnails
-      time = @from
+      time = @from + (interval / 2)
       (1..number_of_caps).each do |i|
         thumb = Frame.new @video, @capturer, time
         time = time + interval
