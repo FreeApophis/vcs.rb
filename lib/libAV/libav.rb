@@ -148,21 +148,21 @@ private
       return parsed
     end
 
-    def parse_audio_streams
+    def parse_video_streams
       parsed = false
-      @audio_streams = []
+      @video_streams = []
       @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
         info = get_hash(stream[0])
-        if info['codec_type'] == 'audio'
-          @audio_streams << LibAVAudioStream.new(info)
+        if info['codec_type'] == 'video'
+          @video_streams << LibAVVideoStream.new(info)
           parsed = true
         end
       end
       unless parsed
         @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
           info = get_hash(stream[0])
-          if info['codec_type'] == 'audio'
-            @audio_streams << LibAVAudioStream.new(info)
+          if info['codec_type'] == 'vidio'
+            @vidio_streams << LibAVVidioStream.new(info)
             parsed = true
           end
         end

@@ -2,7 +2,7 @@ require File.expand_path("lib/version", File.dirname(__FILE__))
 
 Gem::Specification.new do |spec|
   spec.name        = 'vcs_ruby'
-  spec.version     = VCSRuby::update_version
+  spec.version     = VCSRuby::read_version
   spec.date        = Date::today.to_s
   spec.summary     = "Generates contact sheets of videos"
   spec.description = "Creates a contact sheet, a preview, of a video, usable as library or as a script. Based on VCS *NIX. Creating Thumbnails with libav, ffmpeg or mplayer and compose it with ImageMagick into nice looking sheets."
