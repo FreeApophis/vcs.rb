@@ -35,5 +35,5 @@ style:
     background: SlateGray
 lowlevel:
   blank_evasion: true
-  blank_threshold: 0.10
-  blank_alternatives: [ -5, 5, -10, 10, -30, 30]
+  blank_threshold: 0.08
+  blank_alternatives: [ -5, 5, -10, 10, -30, 30, 0]
