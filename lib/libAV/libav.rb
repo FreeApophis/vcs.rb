@@ -86,8 +86,7 @@ private
 
     def probe_meta_information
       check_cache
-      parse_meta_info
-      return true
+      return parse_meta_info
     rescue Exception => e
       puts e
       return false
@@ -109,35 +108,66 @@ private
     end
 
     def parse_meta_info
-      parse_format
-      parse_audio_streams
-      parse_video_streams
+      parse_format && parse_audio_streams && parse_video_streams
     end
 
     def parse_format
+      parsed = false
       @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
         @info = LibAVMetaInfo.new(get_hash(format[0]))
+        parsed = true
       end
+      unless parsed
+        @cache.scan(/\[format\](.*?)\n\n/m) do |format|
+          @info = LibAVMetaInfo.new(get_hash(format[0]))
+          parsed = true
+        end
+      end
+      return parsed
     end
 
     def parse_audio_streams
+      parsed = false
       @audio_streams = []
       @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
         info = get_hash(stream[0])
         if info['codec_type'] == 'audio'
           @audio_streams << LibAVAudioStream.new(info)
+          parsed = true
         end
       end
+      unless parsed
+        @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
+          info = get_hash(stream[0])
+          if info['codec_type'] == 'audio'
+            @audio_streams << LibAVAudioStream.new(info)
+            parsed = true
+          end
+        end
+      end
+      return parsed
     end
 
-    def parse_video_streams
-      @video_streams = []
+    def parse_audio_streams
+      parsed = false
+      @audio_streams = []
       @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
         info = get_hash(stream[0])
-        if info['codec_type'] == 'video'
-          @video_streams << LibAVVideoStream.new(info)
+        if info['codec_type'] == 'audio'
+          @audio_streams << LibAVAudioStream.new(info)
+          parsed = true
         end
       end
+      unless parsed
+        @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
+          info = get_hash(stream[0])
+          if info['codec_type'] == 'audio'
+            @audio_streams << LibAVAudioStream.new(info)
+            parsed = true
+          end
+        end
+      end
+      return parsed
     end
   end
 end
