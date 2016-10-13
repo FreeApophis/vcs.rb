@@ -4,7 +4,6 @@
 
 require 'capturer'
 require 'command'
-require 'time_index'
 
 module VCSRuby
   class FFmpeg < Capturer

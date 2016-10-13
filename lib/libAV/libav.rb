@@ -4,7 +4,6 @@
 
 require 'capturer'
 require 'command'
-require 'time_index'
 
 module VCSRuby
   class LibAV < Capturer
@@ -21,7 +20,7 @@ module VCSRuby
       @video = video
       @avconv = Command.new :libav, 'avconv'
       @avprobe = Command.new :libav, 'avprobe'
-      
+
       detect_version if available?
     end
 
