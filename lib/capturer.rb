@@ -2,42 +2,38 @@
 # Capturer Baseclass
 #
 
+require 'vcs'
+
 module VCSRuby
   class Capturer
+    $formats = { :png => 'png', :bmp => 'bmp', :tiff => 'tif', :mjpeg => 'jpg', :jpeg => 'jpg', :jpg => 'jpg' }
+
     def available?
       false
     end
 
-    def name
-      raise "NotImplementedException"
+    def self.initialize_capturers video
+      capturers = []
+
+      puts "Available capturers: #{available_capturers.map{ |c| c.to_s }.join(', ')}" if Tools.verbose?
     end
 
-    def load_video
-      raise "NotImplementedException"
-    end
+    def self.create
+      capturers = []
 
-    def length
-      raise "NotImplementedException"
-    end
+      capturers << LibAV.new(video)
+      capturers << MPlayer.new(video)
+      capturers << FFmpeg.new(video)
 
-    def width
-      raise "NotImplementedException"
-    end
-
-    def height
-      raise "NotImplementedException"
-    end
-
-    def grab time, image_path
-      raise "NotImplementedException"
-    end
-
-    def available_formats
-      raise "NotImplementedException"
+      return capturers.first
     end
 
     def format
-      @format
+      @format || available_formats.first
+    end
+
+    def format_extension
+      $formats[format]
     end
 
     def format= format

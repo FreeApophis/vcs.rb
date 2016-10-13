@@ -1,6 +1,6 @@
 main:
   rows: 4
-  columns: 4 
+  columns: 4
   interval: ~
   padding: 2
   quality: 95
@@ -20,7 +20,7 @@ style:
     color: Black
     background: White
   highlight:
-    background: LightGoldenRod 
+    background: LightGoldenRod
   contact:
     background: White
   timestamp:
@@ -36,4 +36,4 @@ style:
 lowlevel:
   blank_evasion: true
   blank_threshold: 0.08
-  blank_alternatives: [ -5, 5, -10, 10, -30, 30, 0]
+  blank_alternatives: [ -2, 2, -5, 5, -10, 10, -15, 15, -30, 30, 0]

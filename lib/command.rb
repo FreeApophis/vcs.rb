@@ -17,7 +17,7 @@ module VCSRuby
 
     def execute parameter, streams = 0, no_error = false
       raise "Command '#{name}' not available" unless available?
-      puts "#{@command} #{parameter} #{streams}" if Tools.verbose?
+      puts "#{@command} #{parameter}" if Configuration.instance.verbose?
       result = nil
       if Tools::windows?
         streams = '2> nul' if streams === 0
@@ -40,7 +40,9 @@ private
       ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
         exts.each do |ext|
           exe = File.join(path, "#{cmd}#{ext}")
-          return exe if File.executable?(exe) && !File.directory?(exe)
+          if File.executable?(exe) && !File.directory?(exe)
+            return exe
+          end
         end
       end
       return nil

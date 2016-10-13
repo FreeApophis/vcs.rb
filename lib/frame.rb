@@ -1,59 +1,76 @@
 #
-# Thumbnails from video
+# Frame from video
 #
 
 require 'mini_magick'
 
 module VCSRuby
-  class Thumbnail
+  class Frame
     attr_accessor :width, :height, :aspect
-    attr_accessor :image_path
-    attr_accessor :time
-    attr_reader :filters
+    attr_reader :filters, :time
 
-    def initialize capper, video, configuration
-      @capper = capper
+    def initialize video, capturer, time
       @video = video
-      @configuration = configuration
+      @capturer = capturer
+      @time = time
       @filters = []
     end
 
-    def capture
-      @capper.grab @time, @image_path
+    def filename= file_path
+      @out_path = File.dirname(file_path)
+      @out_filename = File.basename(file_path,'.*')
     end
 
-    def capture_and_evade interval
-      times = [TimeIndex.new] + @configuration.blank_alternatives
-      times.select! { |t| (t < interval / 2) and (t > interval / -2) }
+    def filename
+      File.join(@out_path, "#{@out_filename}.#{@capturer.format_extension}")
+    end
+
+    def format= fmt
+      @capturer.format = fmt
+    end
+
+    def format
+      @capturer.format
+    end
+
+    def capture
+      @capturer.grab @time, filename
+    end
+
+    def capture_and_evade interval = nil
+      times = [TimeIndex.new] + Configuration.instance.blank_alternatives
+      if interval
+        times.select! { |t| (t < interval / 2) and (t > interval / -2) }
+      end
       times.map! { |t| @time + t }
 
       times.each do |time|
         @time = time
         capture
         break unless blank?
-        puts "Blank frame detected. => #{@time}" unless Tools::quiet?
-        puts "Giving up!" if time == times.last && !Tools::quiet?
+        puts "Blank frame detected. => #{@time}" unless Configuration.instance.quiet?
+        puts "Giving up!" if time == times.last && !Configuration.instance.quiet?
       end
     end
 
     def blank?
-      image = MiniMagick::Image.open @image_path
+      image = MiniMagick::Image.open filename
       image.colorspace 'Gray'
       mean = image['%[fx:image.mean]'].to_f
-      return mean < @configuration.blank_threshold
+      return mean < Configuration.instance.blank_threshold
     end
 
     def apply_filters
       MiniMagick::Tool::Convert.new do |convert|
         convert.background 'Transparent'
         convert.fill 'Transparent'
-        convert << @image_path
+        convert << filename
 
         sorted_filters.each do |filter|
           call_filter filter, convert
         end
 
-        convert << @image_path
+        convert << filename
       end
     end
 
@@ -76,12 +93,12 @@ private
 
     def timestamp_filter convert
       convert.stack do |box|
-        box.box @configuration.timestamp_background
-        box.fill  @configuration.timestamp_color
-        box.pointsize @configuration.timestamp_font.size
+        box.box Configuration.instance.timestamp_background
+        box.fill Configuration.instance.timestamp_color
+        box.pointsize Configuration.instance.timestamp_font.size
         box.gravity 'SouthEast'
-        if @configuration.timestamp_font.exists?
-          box.font @configuration.timestamp_font.path 
+        if Configuration.instance.timestamp_font.exists?
+          box.font Configuration.instance.timestamp_font.path
         end
         box.annotate('+10+10', " #{@time.to_timestamp} ")
       end
@@ -115,7 +132,11 @@ private
         a.fill 'White'
         a.background 'White'
         a.bordercolor 'White'
-        a.mattecolor 'White'
+        if Tools.magick_version.major > 6
+          a.alpha_color 'White'
+        else
+          a.mattecolor 'White'
+        end
         a.frame "#{border}x#{border}"
         a.stack do |b|
           b.flip

@@ -3,6 +3,7 @@
 #
 
 module VCSRuby
+
   class Tools
     def self.windows?
       return ((RUBY_PLATFORM =~ /win32/ or RUBY_PLATFORM =~ /mingw32/) or (RbConfig::CONFIG['host_os'] =~ /mswin|windows/i))
@@ -10,24 +11,6 @@ module VCSRuby
 
     def self.linux?
       return ((RUBY_PLATFORM =~ /linux/) or (RbConfig::CONFIG['host_os'] =~ /linux/i))
-    end
-
-    def self.verbose= verbose
-      @verbose = verbose
-      @quiet = false if @verbose
-    end
-
-    def self.verbose?
-      @verbose
-    end
-
-    def self.quiet= quiet
-      @quiet = quiet
-      @verbose = false if @quiet
-    end
-
-    def self.quiet?
-      @quiet
     end
 
     def self.list_arguments arguments
@@ -39,10 +22,20 @@ module VCSRuby
       exit 0
     end
 
-    def self.contact_sheet_with_options video, options
-      sheet = VCSRuby::ContactSheet.new video, options[:profile]
+    MagickVersion = Struct.new(:major, :minor, :revision)
+    def self.magick_version
+      output = %x[convert -version]
+      m = output.match /(\d+)\.(\d+)\.(\d+)(-(\d+))?/
+      MagickVersion.new(m[1].to_i, m[2].to_i, m[3].to_i)
+    end
 
-      sheet.capturer = options[:capturer]
+    def self.contact_sheet_with_options video, options
+      Configuration.instance.load_profile options[:profile] if options[:profile]
+      Configuration.instance.capturer = options[:capturer]
+
+      video = VCSRuby::Video.new video
+      sheet = video.contact_sheet
+
       sheet.format = options[:format] if options[:format]
       sheet.title = options[:title] if options[:title]
       sheet.signature = options[:signature] if options[:signature]
