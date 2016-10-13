@@ -162,7 +162,7 @@ private
         @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
           info = get_hash(stream[0])
           if info['codec_type'] == 'video'
-            @vidio_streams << LibAVVidioStream.new(info)
+            @video_streams << LibAVVideoStream.new(info)
             parsed = true
           end
         end
