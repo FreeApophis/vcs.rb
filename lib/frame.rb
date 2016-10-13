@@ -20,15 +20,15 @@ module VCSRuby
       @out_path = File.dirname(file_path)
       @out_filename = File.basename(file_path,'.*')
     end
-    
+
     def filename
-      File.join(@out_path, "#{@out_filename}.#{@capturer.format_extension}")      
+      File.join(@out_path, "#{@out_filename}.#{@capturer.format_extension}")
     end
-    
+
     def format= fmt
       @capturer.format = fmt
     end
-    
+
     def format
       @capturer.format
     end

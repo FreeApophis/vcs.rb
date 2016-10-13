@@ -10,7 +10,7 @@ module VCSRuby
       @stream = stream
       create_accessors
     end
-    
+
     def create_accessors
       @stream.each do |key, value|
         self.class.send :define_method, key.to_sym do
@@ -18,7 +18,7 @@ module VCSRuby
         end
       end
     end
-    
+
     private
   end
 end

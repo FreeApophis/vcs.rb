@@ -21,7 +21,7 @@ module VCSRuby
     end
 
     def codec short = false
-      @raw['ID_VIDEO_FORMAT']    
+      @raw['ID_VIDEO_FORMAT']
     end
 
     def color_space

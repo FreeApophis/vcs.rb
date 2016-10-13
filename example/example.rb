@@ -60,7 +60,7 @@ if video.valid?
   cs.thumbnail_width = 240
   cs.initialize_filename "cs.jpg"
   cs.build
-  
+
   cs.initialize_filename "cs.png"
   cs.build
 end

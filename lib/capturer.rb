@@ -7,7 +7,7 @@ require 'vcs'
 module VCSRuby
   class Capturer
     $formats = { :png => 'png', :bmp => 'bmp', :tiff => 'tif', :mjpeg => 'jpg', :jpeg => 'jpg', :jpg => 'jpg' }
-    
+
     def available?
       false
     end
@@ -31,7 +31,7 @@ module VCSRuby
     def format
       @format || available_formats.first
     end
-    
+
     def format_extension
       $formats[format]
     end

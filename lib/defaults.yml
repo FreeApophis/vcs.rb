@@ -1,6 +1,6 @@
 main:
   rows: 4
-  columns: 4 
+  columns: 4
   interval: ~
   padding: 2
   quality: 95
@@ -20,7 +20,7 @@ style:
     color: Black
     background: White
   highlight:
-    background: LightGoldenRod 
+    background: LightGoldenRod
   contact:
     background: White
   timestamp:

@@ -14,11 +14,11 @@ Gem::Specification.new do |spec|
   spec.test_files  = Dir['test/*.rb']
   spec.homepage    = 'https://github.com/FreeApophis/vcs.rb'
   spec.license       = 'GPL3'
-  
+
   spec.required_ruby_version = '>= 1.8.6'
   spec.add_dependency 'mini_magick', '>= 4.0.0'
   spec.requirements << 'libav or ffmpeg or mplayer'
-  
+
   spec.add_development_dependency "bundler", ">= 1.5.0"
   spec.add_development_dependency "rake", ">= 10.0.0"
 end

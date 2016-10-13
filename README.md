@@ -25,14 +25,14 @@ vcs.rb has several applications in mind
 
   video = VCSRuby::Video.new 'video.mkv'
   sheet = video.contact_sheet
-  
+
   sheet.format = :jpg
   sheet.sheet.initialize_geometry(3,3,nil)
   sheet.signature = nil
   sheet.thumbnail_width = 320
   sheet.initialize_filename('out.jpg')
   sheet.build
-  
+
   frame = video.frame VCSRuby::TimeIndex.new('1:22')
   frame.filename = "frame.jpg"
   frame.capture_and_evade # evade blank frames
