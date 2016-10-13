@@ -29,9 +29,6 @@ module VCSRuby
 
       detect_video_properties
 
-      @thumbnails = []
-      @filters = []
-
       @from = TimeIndex.new 0
       @to = @video.info.duration
 
@@ -149,6 +146,7 @@ private
     end
 
     def initialize_filters
+      @filters = []
       @filters << :resize_filter
       @filters << :softshadow_filter if softshadow
       @filters << :timestamp_filter if timestamp
@@ -156,6 +154,7 @@ private
     end
 
     def initialize_thumbnails
+      @thumbnails = []
       time = @from + (interval / 2)
       (1..number_of_caps).each do |i|
         thumb = Frame.new @video, @capturer, time

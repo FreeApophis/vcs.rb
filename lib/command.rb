@@ -17,7 +17,7 @@ module VCSRuby
 
     def execute parameter, streams = 0, no_error = false
       raise "Command '#{name}' not available" unless available?
-      puts "#{@command} #{parameter} #{streams}" if Configuration.instance.verbose?
+      puts "#{@command} #{parameter}" if Configuration.instance.verbose?
       result = nil
       if Tools::windows?
         streams = '2> nul' if streams === 0

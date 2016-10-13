@@ -37,9 +37,8 @@ module VCSRuby
     end
 
     def grab time, image_path
-      @mplayer.execute "-sws 9 -ao null -benchmark -vo #{@format} -quiet -frames 5 -ss #{time.total_seconds} \"#{@video.full_path}\""
-      (1..4).each { |n| FileUtils.rm(file_pattern(n)) }
-      FileUtils.mv(file_pattern(5), image_path)
+      @mplayer.execute "-vo png -ss #{time.total_seconds} -endpos 0 \"#{@video.full_path}\""
+      FileUtils.mv(file_pattern(1), image_path)
     end
 
     def available_formats
@@ -93,8 +92,10 @@ module VCSRuby
       @info = MPlayerMetaInfo.new(mplayer_hash, File.size(@video.full_path))
 
       # Todo: Handling of multiple streams
-      @info = [ MPlayerVideoStream.new(get_hash(mplayer_hash) ]
-      @info = [ MPlayerAudioStream.new(get_hash(mplayer_hash) ]
+      @video_streams = []
+      @video_streams << MPlayerVideoStream.new(mplayer_hash)
+      @audio_streams = []
+      @audio_streams << MPlayerAudioStream.new(mplayer_hash)
     end
 
     def file_pattern n

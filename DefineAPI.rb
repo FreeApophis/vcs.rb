@@ -1,6 +1,9 @@
-require_relative 'lib/vcs'
+#!/usr/bin/ruby
+
+require './lib/vcs'
 
 VCSRuby::Configuration.instance.verbose = true
+VCSRuby::Configuration.instance.capturer = :mplayer
 
 video = VCSRuby::Video.new "ons3on3cup_hdtv.mp4"
 #video = VCSRuby::Video.new "fat_vs_flat.nsv"
