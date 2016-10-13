@@ -12,11 +12,11 @@ module VCSRuby
   end
 
   def self.update_version
+    current_version = read_version
     parts = File.open(version_path, &:readline).split('.').map(&:strip)
     parts[2] = (parts[2].to_i + 1).to_s
     File.open(version_path, 'w') {|f| f.write(parts.join('.')) }
-
-    read_version
+    current_version    
   end
 end
 
