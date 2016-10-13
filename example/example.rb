@@ -3,11 +3,9 @@
 require './lib/vcs'
 
 VCSRuby::Configuration.instance.verbose = true
-VCSRuby::Configuration.instance.capturer = :mplayer
+# VCSRuby::Configuration.instance.capturer = :mplayer
 
 video = VCSRuby::Video.new "ons3on3cup_hdtv.mp4"
-#video = VCSRuby::Video.new "fat_vs_flat.nsv"
-#video = VCSRuby::Video.new "3years UT2k4_PPC_VGA.avi"
 
 puts "valid?: #{video.valid?}"
 
@@ -66,6 +64,5 @@ if video.valid?
   cs.initialize_filename "cs.png"
   cs.build
 end
-
 
 puts "DONE"
