@@ -9,7 +9,6 @@ module VCSRuby
 
     def initialize audio_stream
       @raw = audio_stream
-
     end
 
     def codec short = false

@@ -42,7 +42,11 @@ module VCSRuby
 
 
     def frame_rate
-      Rational(@raw['r_frame_rate'])
+      if @raw['r_frame_rate']
+        @raw['r_frame_rate'].to_r
+      elsif @raw['avg_frame_rate']
+        @raw['avg_frame_rate'].to_r
+      end
     end
 
     def aspect_ratio
