@@ -63,14 +63,6 @@ module VCSRuby
     def format_split line
       name = line.strip.split(' ', 2).first
     end
-    def probe_meta_information
-      check_cache
-      parse_meta_info
-      return true
-    rescue Exception => e
-      puts e
-      return false
-    end
 
     def check_cache
       unless @cache
@@ -78,24 +70,24 @@ module VCSRuby
       end
     end
 
-    def get_hash defines
-      result = {}
-      defines.lines.each do |line|
-        kv = line.split("=")
-        result[kv[0].strip] = kv[1].strip if kv.count == 2
-      end
-      result
-    end
-
-    def parse_meta_info
+    def parse_format
       mplayer_hash = get_hash(@cache)
       @info = MPlayerMetaInfo.new(mplayer_hash, File.size(@video.full_path))
+      return true
+    end
 
-      # Todo: Handling of multiple streams
-      @video_streams = []
-      @video_streams << MPlayerVideoStream.new(mplayer_hash)
+    def parse_audio_streams
       @audio_streams = []
+      mplayer_hash = get_hash(@cache)
       @audio_streams << MPlayerAudioStream.new(mplayer_hash)
+      return true
+    end
+
+    def parse_video_streams
+      @video_streams = []
+      mplayer_hash = get_hash(@cache)
+      @video_streams << MPlayerVideoStream.new(mplayer_hash)
+      return true
     end
 
     def file_pattern n

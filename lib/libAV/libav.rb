@@ -84,90 +84,68 @@ private
       return nil, false, false
     end
 
-    def probe_meta_information
-      check_cache
-      return parse_meta_info
-    rescue Exception => e
-      puts e
-      return false
-    end
-
     def check_cache
       unless @cache
         @cache = @avprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
       end
     end
 
-    def get_hash defines
-      result = {}
-      defines.lines.each do |line|
-        kv = line.split("=")
-        result[kv[0].strip] = kv[1].strip if kv.count == 2
+    def extract_format regexp
+      @cache.scan() do |format|
+        @info = LibAVMetaInfo.new(get_hash(format[0]))
+        return true
       end
-      result
-    end
-
-    def parse_meta_info
-      parse_format && parse_audio_streams && parse_video_streams
+      false
     end
 
     def parse_format
-      parsed = false
-      @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
-        @info = LibAVMetaInfo.new(get_hash(format[0]))
-        parsed = true
-      end
+      parsed = extract_format(/\[FORMAT\](.*?)\[\/FORMAT\]/m)
       unless parsed
-        @cache.scan(/\[format\](.*?)\n\n/m) do |format|
-          @info = LibAVMetaInfo.new(get_hash(format[0]))
-          parsed = true
-        end
+        parsed = extract_format(/\[format\](.*?)\n\n/m)
       end
       return parsed
     end
 
-    def parse_audio_streams
+    def extract_audio_streams regexp
       parsed = false
-      @audio_streams = []
-      @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
+      @cache.scan(regexp) do |stream|
         info = get_hash(stream[0])
         if info['codec_type'] == 'audio'
           @audio_streams << LibAVAudioStream.new(info)
           parsed = true
         end
       end
-      unless parsed
-        @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
-          info = get_hash(stream[0])
-          if info['codec_type'] == 'audio'
-            @audio_streams << LibAVAudioStream.new(info)
-            parsed = true
-          end
-        end
-      end
-      return parsed
+      parsed
     end
 
-    def parse_video_streams
+    def parse_audio_streams
+      @audio_streams = []
+      parsed = extract_audio_streams(/\[STREAM\](.*?)\[\/STREAM\]/m)
+      unless parsed
+        extract_audio_streams(/\[streams.stream.\d\](.*?)\n\n/m)
+      end
+      true
+    end
+
+    def extract_video_streams regexp
       parsed = false
-      @video_streams = []
-      @cache.scan(/\[STREAM\](.*?)\[\/STREAM\]/m) do |stream|
+      @cache.scan(regexp) do |stream|
         info = get_hash(stream[0])
         if info['codec_type'] == 'video'
           @video_streams << LibAVVideoStream.new(info)
           parsed = true
         end
       end
+      parsed
+    end
+
+    def parse_video_streams
+      @video_streams = []
+      parsed = extract_video_streams(/\[STREAM\](.*?)\[\/STREAM\]/m)
       unless parsed
-        @cache.scan(/\[streams.stream.\d\](.*?)\n\n/m) do |stream|
-          info = get_hash(stream[0])
-          if info['codec_type'] == 'video'
-            @video_streams << LibAVVideoStream.new(info)
-            parsed = true
-          end
-        end
+        parsed = extract_video_streams(/\[streams.stream.\d\](.*?)\n\n/m)
       end
-      return parsed
+      true
     end
   end
 end

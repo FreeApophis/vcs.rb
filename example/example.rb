@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require './lib/vcs'
+require '../lib/vcs'
 
 VCSRuby::Configuration.instance.verbose = true
 # VCSRuby::Configuration.instance.capturer = :mplayer

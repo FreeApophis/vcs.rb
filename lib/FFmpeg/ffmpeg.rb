@@ -82,40 +82,18 @@ private
       return nil, false, false
     end
 
-    def probe_meta_information
-      check_cache
-      parse_meta_info
-      return true
-    rescue Exception => e
-      puts e
-      return false
-    end
-
     def check_cache
       unless @cache
         @cache = @ffprobe.execute("\"#{@video.full_path}\"  -show_format -show_streams", "2>&1")
       end
     end
 
-    def get_hash defines
-      result = {}
-      defines.lines.each do |line|
-        kv = line.split("=")
-        result[kv[0].strip] = kv[1].strip if kv.count == 2
-      end
-      result
-    end
-
-    def parse_meta_info
-      parse_format
-      parse_audio_streams
-      parse_video_streams
-    end
-
     def parse_format
       @cache.scan(/\[FORMAT\](.*?)\[\/FORMAT\]/m) do |format|
         @info = FFmpegMetaInfo.new(get_hash(format[0]))
+        return true
       end
+      false
     end
 
     def parse_audio_streams
@@ -126,6 +104,7 @@ private
           @audio_streams << FFmpegAudioStream.new(info)
         end
       end
+      true
     end
 
     def parse_video_streams
@@ -136,6 +115,7 @@ private
           @video_streams << FFmpegVideoStream.new(info)
         end
       end
+      true
     end
   end
 end
