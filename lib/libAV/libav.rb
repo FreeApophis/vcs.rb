@@ -91,7 +91,7 @@ private
     end
 
     def extract_format regexp
-      @cache.scan() do |format|
+      @cache.scan(regexp) do |format|
         @info = LibAVMetaInfo.new(get_hash(format[0]))
         return true
       end

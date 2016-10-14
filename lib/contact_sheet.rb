@@ -328,7 +328,7 @@ private
             b.gravity 'East'
             b.fill Configuration.instance.header_color
             b.annotate '+0-1'
-            b << "Dimensions: #{@video.video.width}x#{@video.video.height}\nFormat: #{@video.video.codec(true)} / #{@video.audio.codec(true)}\nFPS: #{"%.02f" % @video.video.frame_rate.to_f}"
+            b << "Dimensions: #{@video.video.width}x#{@video.video.height}\nFormat: #{@video.video.codec(true)} / #{@video.audio ? @video.audio.codec(true) : 'no audio'}\nFPS: #{"%.02f" % @video.video.frame_rate.to_f}"
           end
           a.bordercolor Configuration.instance.header_background
           a.border 9
