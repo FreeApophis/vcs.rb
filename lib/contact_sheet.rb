@@ -337,7 +337,7 @@ private
         convert << create_highlight(montage) if @highlight
         convert << montage.path
         convert.append
-        if @signature
+        if @signature && @signature.length > 0
           convert.stack do |a|
             a.size "#{montage.width}x#{signature_height}"
             a.gravity 'Center'

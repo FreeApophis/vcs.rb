@@ -7,6 +7,7 @@ VCSRuby::Configuration.instance.verbose = true
 
 video = VCSRuby::Video.new "ons3on3cup_hdtv.mp4"
 
+# Always call valid? before you access the meta-information! 
 puts "valid?: #{video.valid?}"
 
 if video.valid?
@@ -62,6 +63,10 @@ if video.valid?
   cs.build
 
   cs.initialize_filename "cs.png"
+  cs.initialize_geometry(2, 2, nil)
+  cs.thumbnail_width = 320
+  cs.signature = nil
+  cs.title = "Title"
   cs.build
 end
 
