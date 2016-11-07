@@ -12,7 +12,7 @@ module VCSRuby
   class ContactSheet
     attr_accessor :signature, :title, :highlight
     attr_accessor :softshadow, :timestamp, :polaroid
-    attr_reader :thumbnail_width, :thumbnail_height
+    attr_reader :thumbnail_width, :thumbnail_height, :format
     attr_reader :length, :from, :to
 
     def initialize video, capturer
@@ -60,6 +60,10 @@ module VCSRuby
 
     def filename
       "#{@out_filename}#{@format}"
+    end
+    
+    def format= format
+      @format = ".#{format.to_s}"
     end
 
     def full_path
