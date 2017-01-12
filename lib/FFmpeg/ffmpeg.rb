@@ -32,7 +32,7 @@ module VCSRuby
     end
 
     def available?
-      @ffmpeg.available? && !libav?
+      @ffmpeg.available? && @ffprobe.available? && !libav?
     end
 
     def libav?

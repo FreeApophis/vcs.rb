@@ -34,6 +34,12 @@ module VCSRuby
       Configuration.instance.capturer = options[:capturer]
 
       video = VCSRuby::Video.new video
+      
+      unless video.valid?
+        puts "Video '#{video.full_path}' cannot be read by Capturer '#{video.capturer_name}'"
+        return nil
+      end
+      
       sheet = video.contact_sheet
 
       sheet.format = options[:format] if options[:format]
@@ -45,6 +51,11 @@ module VCSRuby
         sheet.initialize_geometry(options[:rows], options[:columns], options[:interval])
       end
 
+      if options[:width] && options[:height]
+        sheet.aspect_ratio = Rational(options[:width], options[:height])
+      else
+        sheet.aspect_ratio = options[:aspect_ratio] if options[:aspect_ratio]      
+      end
       sheet.thumbnail_width = options[:width] if options[:width]
       sheet.thumbnail_height = options[:height] if options[:height]
       sheet.from = options[:from] if options[:from]

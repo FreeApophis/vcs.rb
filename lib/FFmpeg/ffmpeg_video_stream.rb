@@ -50,7 +50,13 @@ module VCSRuby
     end
 
     def aspect_ratio
-      @raw['display_aspect_ratio']
+      colon = ":"
+      if @raw['display_aspect_ratio'].include? colon
+        w,h = @raw['display_aspect_ratio'].split(colon)
+        Rational(w,h)
+      else
+        @raw['display_aspect_ratio'].to_f
+      end
     end
   end
 end

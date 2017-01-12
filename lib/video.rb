@@ -48,6 +48,10 @@ module VCSRuby
     def frame time_index
       return Frame.new self, capturer, time_index
     end
+    
+    def capturer_name
+      capturer.name
+    end
 
 private
     def initialize_filename video

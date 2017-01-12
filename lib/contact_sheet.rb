@@ -12,7 +12,7 @@ module VCSRuby
   class ContactSheet
     attr_accessor :signature, :title, :highlight
     attr_accessor :softshadow, :timestamp, :polaroid
-    attr_reader :thumbnail_width, :thumbnail_height, :format
+    attr_reader :thumbnail_width, :thumbnail_height, :aspect_ratio, :format
     attr_reader :length, :from, :to
 
     def initialize video, capturer
@@ -103,7 +103,12 @@ module VCSRuby
       @thumbnail_width = (height.to_f / @thumbnail_height * thumbnail_width).to_i
       @thumbnail_height = height
     end
-
+    
+    def aspect_ratio= aspect_ratio
+      @thumbnail_width = (@thumbnail_height * aspect_ratio).to_i
+      @aspect_ratio = aspect_ratio
+    end
+    
     def from= time
       if (TimeIndex.new(0) < time) && (time < to) && (time < @length)
         @from = time
@@ -201,6 +206,15 @@ private
     def detect_dimensions
       @thumbnail_width = @video.video.width
       @thumbnail_height = @video.video.height
+      
+      @aspect_ratio = @video.video.aspect_ratio
+      
+      if @aspect_ratio == 0
+        @aspect_ratio = Rational(@video.video.width, @video.video.height)
+      else
+        #recalculate width, for PAR 1:1 this should be the same as before
+        @thumbnail_width = (@aspect_ratio * @video.video.height).to_i
+      end
     end
 
     def montage_thumbs

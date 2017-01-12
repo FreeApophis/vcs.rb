@@ -56,8 +56,8 @@ optparse = OptionParser.new do|opts|
   opts.on( '-W [WIDTH]', '--width [WIDTH]', 'Set the output (individual thumbnail) width.') do |width|
     options[:width] = width.to_i
   end
-  opts.on( '-A [ASPECT]', '--aspect [ASPECT]', 'Aspect ratio. Accepts a floating point number or a fraction.') do |aspect|
-    options[:aspect] = aspect.to_f
+  opts.on( '-A [ASPECT]', '--aspect [ASPECT]', 'Aspect ratio. Accepts a floating point number or a fraction. (i.e. 16/19)') do |aspect|
+    options[:aspect_ratio] = aspect.to_r
   end
   opts.on( '-f [FROM]', '--from [FROM]', 'Set starting time. No caps before this.') do |from|
     options[:from] = TimeIndex.new from
@@ -150,8 +150,10 @@ errors = {}
 ARGV.each_with_index do |video, index|
   begin
     sheet = Tools::contact_sheet_with_options video, options
-    sheet.initialize_filename(options[:output][index]) if options[:output][index]
-    sheet.build
+    if sheet
+      sheet.initialize_filename(options[:output][index]) if options[:output][index]
+      sheet.build
+    end
   rescue Exception => e
     errors[video] = e
     STDERR.puts "ERROR: #{e.message}"
