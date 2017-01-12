@@ -165,19 +165,19 @@ The cs_url alternative gives you the right path. This is not very nice though. A
 
 ### Command Line Options
 
-    Video Contact Sheet Ruby 1.0.0
+Video Contact Sheet Ruby 1.1.9
 
         -i, --interval [INTERVAL]        Set the interval [INTERVAL]
         -c, --columns [COLUMNS]          Arrange the output in <COLUMNS> columns.
         -r, --rows [ROWS]                Arrange the output in <ROWS> rows.
         -H, --height [HEIGHT]            Set the output (individual thumbnail) height.
         -W, --width [WIDTH]              Set the output (individual thumbnail) width.
-        -A, --aspect [ASPECT]            Aspect ratio. Accepts a floating point number or a fraction.
+        -A, --aspect [ASPECT]            Aspect ratio. Accepts a floating point number or a fraction. (i.e. 16/19)
             --from [FROM]                Set starting time. No caps before this.
         -t, --to [TO]                    Set ending time. No caps beyond this.
         -f, --format [FORMAT]            Formats: png, jpg, jpeg, tiff
         -C, --capture [CAPTURER]         Capturer: ffmpeg, libav, mplayer, any
-        -T, --title [TITLE]              Set ending time. No caps beyond this.
+        -T, --title [TITLE]              Set Title
         -o, --output [FILE]              File name of output. When ommited will be derived from the input filename. Can be repeated for multiple files.
         -s, --signature [SIGNATURE]      Change the image signature to your preference.
             --no-signature               Remove footer with signature
@@ -187,6 +187,7 @@ The cs_url alternative gives you the right path. This is not very nice though. A
             --[no-]polaroid              Add  polaroid frame to thumbnail. Default: false
         -p, --profile [PROFILE]          Loads additional setting from profile.yml.
         -q, --quiet                      Don't print progress messages just errors.
+            --continue                   Prints Error message and continues with next file (if any left)
         -V, --verbose                    More verbose Output.
         -v, --version                    Current Version
         -h, --help                       Prints help
