@@ -1,5 +1,5 @@
 #
-# FFmpeg Abstraction
+# Mock Implementation for Tests
 #
 
 require 'capturer'
