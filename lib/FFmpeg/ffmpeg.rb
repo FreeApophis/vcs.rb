@@ -19,6 +19,7 @@ module VCSRuby
       @video = video
       @ffmpeg = Command.new :ffmpeg, 'ffmpeg'
       @ffprobe = Command.new :ffmpeg, 'ffprobe'
+      @libav = nil
 
       detect_version if available?
     end
@@ -41,9 +42,9 @@ module VCSRuby
 
     def detect_version
       info = @ffmpeg.execute('-version')
-      match = /avconv ([\d|.|-|:]*)/.match(info)
+      match = /avconv ([\d|\.|\-|:]*)/.match(info)
       @libav = !!match
-      match = /ffmpeg version ([\d|.]*)/.match(info)
+      match = /ffmpeg version ([\d|\.]*)/.match(info)
       if match
         @version = match[1]
       end

@@ -2,8 +2,6 @@
 # Represents the video file
 #
 
-require 'vcs'
-
 module VCSRuby
   class Video
     attr_reader :config
@@ -77,7 +75,9 @@ private
 
     def capturer
       result = nil
-      if Configuration.instance.capturer == :any
+      if Configuration.instance.capturer == :mock
+        result = MockCapturer.new(self)
+      elsif Configuration.instance.capturer == :any
         result = available_capturers.first
       else
         result = available_capturers.select{ |c| c.name == Configuration.instance.capturer }.first

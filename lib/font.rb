@@ -37,7 +37,7 @@ module VCSRuby
 
     def font_by_name name
       if name =~ /\./
-        key, font = @@fonts.select{ |key, f| f.glyphs =~ /#{name}\z/ }.first
+        _, font = @@fonts.select{ |k, f| f.glyphs =~ /#{name}\z/ }.first
         return font
       else
         @@fonts[name]

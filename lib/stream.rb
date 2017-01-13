@@ -2,8 +2,6 @@
 # Represents a stream in a video
 #
 
-require 'vcs'
-
 module VCSRuby
   class Stream
     def initialize stream

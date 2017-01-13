@@ -6,8 +6,6 @@ require 'fileutils'
 require 'tmpdir'
 require 'yaml'
 
-require 'vcs'
-
 module VCSRuby
   class ContactSheet
     attr_accessor :signature, :title, :highlight
@@ -254,7 +252,7 @@ private
         convert << file_path
       end
       file_path
-     end
+    end
 
     def create_title montage
       file_path = File::join(@tempdir, 'title.png')

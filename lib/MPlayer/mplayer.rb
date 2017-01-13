@@ -61,7 +61,7 @@ module VCSRuby
 
   private
     def format_split line
-      name = line.strip.split(' ', 2).first
+      line.strip.split(' ', 2).first
     end
 
     def check_cache

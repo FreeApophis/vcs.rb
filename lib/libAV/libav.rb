@@ -39,7 +39,7 @@ module VCSRuby
 
     def detect_version
       info = @avconv.execute('-version')
-      match = /avconv ([\d|.|-|:]*)/.match(info)
+      match = /avconv ([\d|\.|\-|:]*)/.match(info)
       if match
         @version = match[1]
       end

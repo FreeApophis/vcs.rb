@@ -2,8 +2,6 @@
 # Capturer Baseclass
 #
 
-require 'vcs'
-
 module VCSRuby
   class Capturer
     $formats = { :png => 'png', :bmp => 'bmp', :tiff => 'tif', :mjpeg => 'jpg', :jpeg => 'jpg', :jpg => 'jpg' }
@@ -13,8 +11,6 @@ module VCSRuby
     end
 
     def self.initialize_capturers video
-      capturers = []
-
       puts "Available capturers: #{available_capturers.map{ |c| c.to_s }.join(', ')}" if Tools.verbose?
     end
 

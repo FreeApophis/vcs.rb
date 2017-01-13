@@ -47,14 +47,10 @@ module VCSRuby
     end
 
     def try_parse_as_number
-      temp = @to_parse.to_i
+      temp = @to_parse.to_f
       if temp.to_s == @to_parse
         @total_seconds += temp
       end
-    end
-
-    def total_seconds
-      @total_seconds
     end
 
     def hours

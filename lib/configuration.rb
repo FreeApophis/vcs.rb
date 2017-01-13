@@ -22,6 +22,7 @@ module VCSRuby
     def initialize
       default_config_file = File.expand_path("defaults.yml", File.dirname(__FILE__))
       @config = ::YAML::load_file(default_config_file)
+      @verbose = false
 
       local_config_files = ['~/.vcs.rb.yml']
       local_config_files.select{ |f| File.exists?(f) }.each do |local_config_file|
@@ -39,10 +40,10 @@ module VCSRuby
       profiles = [File.expand_path("#{profile}.yml", File.dirname(__FILE__)), "~/#{profile}.yml"]
 
       found = false
-      profiles.each do |profile|
-        if File.exists?(profile)
+      profiles.each do |p|
+        if File.exists?(p)
           puts "Profile loaded: #{profile}" if verbose?
-          config = YAML::load_file(profile)
+          config = YAML::load_file(p)
           @config = @config.deep_merge(config)
           found = true
         end
@@ -147,4 +148,4 @@ module VCSRuby
       !!@config['filter']['softshadow']
     end
   end
- end
+end

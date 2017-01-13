@@ -1,5 +1,5 @@
 #
-# Dependencies
+# Various Tool Functions
 #
 
 module VCSRuby
@@ -25,7 +25,7 @@ module VCSRuby
     MagickVersion = Struct.new(:major, :minor, :revision)
     def self.magick_version
       output = %x[convert -version]
-      m = output.match /(\d+)\.(\d+)\.(\d+)(-(\d+))?/
+      m = output.match(/(\d+)\.(\d+)\.(\d+)(-(\d+))?/)
       MagickVersion.new(m[1].to_i, m[2].to_i, m[3].to_i)
     end
 
