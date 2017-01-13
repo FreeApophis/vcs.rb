@@ -209,7 +209,7 @@ private
       
       @aspect_ratio = @video.video.aspect_ratio
       
-      if @aspect_ratio == 0
+      if @aspect_ratio == 0 || @aspect_ratio == nil
         @aspect_ratio = Rational(@video.video.width, @video.video.height)
       else
         #recalculate width, for PAR 1:1 this should be the same as before

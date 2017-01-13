@@ -25,8 +25,7 @@ module VCSRuby
         result = `cmd /S /C ""#{@command}" #{parameter} #{streams}"`
       else
         streams = "2> /dev/null" if streams === 0
-
-        result =`"#{@command} #{parameter}" #{streams}`
+        result =`"#{@command}" #{parameter} #{streams}`
       end
 
       raise "#{@command} failed with return value '#{$?}'" unless $?.to_i == 0 || no_error

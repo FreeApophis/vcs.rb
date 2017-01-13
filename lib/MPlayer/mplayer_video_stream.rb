@@ -38,7 +38,7 @@ module VCSRuby
     end
 
     def aspect_ratio
-      ''
+      nil
     end
   end
 end

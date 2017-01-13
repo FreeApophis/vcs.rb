@@ -50,6 +50,8 @@ module VCSRuby
     end
 
     def aspect_ratio
+      return nil if @raw['display_aspect_ratio'] == nil
+
       colon = ":"
       if @raw['display_aspect_ratio'].include? colon
         w,h = @raw['display_aspect_ratio'].split(colon)
