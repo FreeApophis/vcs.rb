@@ -54,7 +54,7 @@ module VCSRuby
 
       colon = ":"
       if @raw['display_aspect_ratio'].include? colon
-        w,h = @raw['display_aspect_ratio'].split(colon)
+        w,h = @raw['display_aspect_ratio'].split(colon).map { |n| n.to_i }
         Rational(w,h)
       else
         @raw['display_aspect_ratio'].to_f
