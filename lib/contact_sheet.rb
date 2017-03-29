@@ -277,7 +277,7 @@ private
 
     def create_highlight montage
       puts "Generating highlight..."
-      thumb = Frame.new @video, @highlight
+      thumb = Frame.new @video, @capturer, @highlight
 
       thumb.width = thumbnail_width
       thumb.height = thumbnail_height
