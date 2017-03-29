@@ -52,6 +52,10 @@ module VCSRuby
     end
 
     def available_formats
+      @available_formats ||= available_formats_query
+    end
+
+    def available_formats_query
       # Ordered by priority
       image_formats = ['png', 'tiff', 'bmp', 'mjpeg']
       formats = []
