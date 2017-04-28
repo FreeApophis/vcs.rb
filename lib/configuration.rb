@@ -25,7 +25,7 @@ module VCSRuby
       @verbose = false
 
       local_config_files = ['~/.vcs.rb.yml']
-      local_config_files.select{ |f| File.exists?(f) }.each do |local_config_file|
+      local_config_files.select{ |f| File.exist?(f) }.each do |local_config_file|
         local_config = YAML::load_file(local_config_file)
         @config = @config.deep_merge(local_config)
       end
@@ -41,7 +41,7 @@ module VCSRuby
 
       found = false
       profiles.each do |p|
-        if File.exists?(p)
+        if File.exist?(p)
           puts "Profile loaded: #{profile}" if verbose?
           config = YAML::load_file(p)
           @config = @config.deep_merge(config)

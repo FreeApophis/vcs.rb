@@ -8,7 +8,7 @@ module VCSRuby
     attr_reader :total_seconds
 
     def initialize time_index = ''
-      if time_index.instance_of? Float or time_index.instance_of? Fixnum
+      if time_index.instance_of? Float or time_index.instance_of? Integer
         @total_seconds = time_index
       else
         @total_seconds = 0.0
@@ -66,7 +66,7 @@ module VCSRuby
     end
 
     def + operand
-      if operand.instance_of? Fixnum
+      if operand.instance_of? Integer
         TimeIndex.new @total_seconds + operand
       else
         TimeIndex.new @total_seconds + operand.total_seconds
@@ -74,7 +74,7 @@ module VCSRuby
     end
 
     def - operand
-      if operand.instance_of? Fixnum
+      if operand.instance_of? Integer
         TimeIndex.new @total_seconds - operand
       else
         TimeIndex.new @total_seconds - operand.total_seconds
@@ -86,7 +86,7 @@ module VCSRuby
     end
 
     def / operand
-      if operand.instance_of? Fixnum
+      if operand.instance_of? Integer
         TimeIndex.new @total_seconds / operand
       else
         @total_seconds / operand.total_seconds
