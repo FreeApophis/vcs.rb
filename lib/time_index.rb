@@ -7,17 +7,23 @@ module VCSRuby
     include Comparable
     attr_reader :total_seconds
 
+    def has_unified_integer?
+      version = RUBY_VERSION.split('.').collect(&:to_i)
+
+      return (version[0] == 2 && version[1] >= 4) || version[0] > 2
+    end
+
     # compatibilty fix
     def is_integer? variable
-      if defined?(Integer)
-        return variable.instance_of? Integer
+      if has_unified_integer?
+        return variable.instance_of?(Integer)
       else
         return variable.instance_of?(Fixnum) || variable.instance_of?(Bignum)
       end
     end
 
     def initialize time_index = ''
-      if time_index.instance_of? Float or is_integer?(time_index)
+      if is_integer?(time_index) || time_index.instance_of?(Float)
         @total_seconds = time_index
       else
         @total_seconds = 0.0
