@@ -37,8 +37,7 @@ module VCSRuby
     end
 
     def load_profile profile
-      profiles = [File.expand_path("#{profile}.yml", File.dirname(__FILE__)), "~/#{profile}.yml"]
-
+      profiles = [File.expand_path("#{profile}.yml", File.dirname(__FILE__)), File.expand_path("~/#{profile}.yml")]
       found = false
       profiles.each do |p|
         if File.exist?(p)
